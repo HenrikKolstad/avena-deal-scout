@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVENA Deal Scout — Costa Blanca & Costa Cálida</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --card: #111118;
+  --card2: #18181f;
+  --hover: #1c1c26;
+  --gold: #c9a34f;
+  --gold-light: #e2c477;
+  --gold-dark: #9a7a33;
+  --green: #10b981;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --text: #e8e4dc;
+  --muted: #8a8680;
+  --border: #2a2a30;
+  --border-gold: rgba(201,163,79,0.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.serif{font-family:'Playfair Display',Georgia,serif;}
+
+/* TOP BAR */
+.top-bar{background:linear-gradient(180deg,#12121a 0%,#0a0a0f 100%);border-bottom:1px solid var(--border-gold);padding:20px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;position:sticky;top:0;z-index:200;}
+.logo{display:flex;align-items:center;gap:16px;}
+.logo-text h1{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;letter-spacing:3px;background:linear-gradient(135deg,#e2c477 0%,#c9a34f 40%,#9a7a33 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.logo-text p{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-top:2px;}
+.logo-tagline{font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:4px;font-style:italic;}
+.stats-row{display:flex;gap:24px;flex-wrap:wrap;}
+.stat{text-align:center;min-width:70px;}
+.stat-val{font-size:24px;font-weight:700;color:var(--gold);font-family:'Playfair Display',serif;}
+.stat-lbl{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-top:2px;}
+
+/* CONTROLS */
+.controls{background:var(--card);border-bottom:1px solid var(--border);padding:14px 32px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;}
+.cg{display:flex;flex-direction:column;gap:3px;}
+.cg label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
+select,input[type=text],input[type=number]{background:#08080d;border:1px solid var(--border);color:var(--text);padding:7px 11px;border-radius:6px;font-size:12px;outline:none;min-width:130px;font-family:'Inter',sans-serif;}
+select:focus,input:focus{border-color:var(--gold);}
+.btn{padding:7px 16px;border-radius:6px;border:1px solid var(--gold-dark);cursor:pointer;font-size:12px;font-weight:600;background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#000;transition:all .2s;font-family:'Inter',sans-serif;}
+.btn:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));transform:translateY(-1px);}
+
+/* TABS */
+.tabs{display:flex;gap:0;padding:0 32px;background:var(--card);border-bottom:1px solid var(--border);}
+.tab{padding:11px 22px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:0.5px;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;padding:0 16px 24px;}
+table{width:100%;border-collapse:separate;border-spacing:0;min-width:1100px;}
+thead th{background:#0e0e15;padding:10px 12px;font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;position:sticky;top:0;z-index:10;}
+thead th:hover{color:var(--gold);}
+thead th.sa::after{content:' ▲';color:var(--gold);}
+thead th.sd::after{content:' ▼';color:var(--gold);}
+tbody tr{transition:background .12s;cursor:pointer;}
+tbody tr:hover{background:var(--hover);}
+tbody td{padding:10px 12px;border-bottom:1px solid #1a1a22;font-size:12px;vertical-align:middle;}
+tbody tr.r1{background:rgba(201,163,79,0.06);}
+tbody tr.r2{background:rgba(201,163,79,0.03);}
+tbody tr.r3{background:rgba(201,163,79,0.015);}
+tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--gold);}
+
+.rb{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;}
+.r1 .rb{background:var(--gold);color:#000;box-shadow:0 0 10px rgba(201,163,79,0.4);}
+.r2 .rb{background:#9ca3af;color:#000;}
+.r3 .rb{background:#cd7f32;color:#fff;}
+
+.sc{font-size:16px;font-weight:800;font-family:'Playfair Display',serif;}
+.sc.ex{color:#10b981;} .sc.gr{color:#34d399;} .sc.gd{color:var(--gold);} .sc.fr{color:#f97316;} .sc.av{color:var(--muted);}
+
+.dt{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;}
+.dt.hot{background:rgba(239,68,68,0.12);color:#ef4444;}
+.dt.warm{background:rgba(201,163,79,0.12);color:var(--gold);}
+.dt.cool{background:rgba(59,130,246,0.12);color:#60a5fa;}
+.dt.op{background:rgba(16,185,129,0.12);color:#10b981;}
+
+.tt{display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:600;}
+.tt-v{background:rgba(139,92,246,0.12);color:#a78bfa;}
+.tt-a{background:rgba(59,130,246,0.12);color:#60a5fa;}
+.tt-t{background:rgba(16,185,129,0.12);color:#34d399;}
+
+.rt{display:inline-block;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:600;}
+.rt-s{background:rgba(59,130,246,0.1);color:#60a5fa;}
+.rt-n{background:rgba(16,185,129,0.1);color:#34d399;}
+.rt-c{background:rgba(201,163,79,0.1);color:var(--gold);}
+
+.pn{color:var(--gold-light);font-weight:600;font-size:12px;}
+.loc{color:var(--muted);font-size:11px;}
+.dev{font-weight:600;font-size:11px;}
+.pm{font-weight:700;font-size:13px;}
+
+/* PREVIEW PANEL */
+.preview-overlay{display:none;position:fixed;top:0;right:0;width:480px;height:100vh;background:var(--card);border-left:1px solid var(--border-gold);z-index:300;overflow-y:auto;box-shadow:-8px 0 32px rgba(0,0,0,0.5);transition:transform .3s ease;}
+.preview-overlay.open{display:block;animation:slideIn .25s ease-out;}
+@keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.prev-close{position:absolute;top:16px;right:16px;background:none;border:1px solid var(--border);color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;z-index:10;}
+.prev-close:hover{border-color:var(--gold);color:var(--gold);}
+.prev-img{width:100%;height:240px;background:var(--card2);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+.prev-img img{width:100%;height:100%;object-fit:cover;transition:opacity .3s;}
+.prev-img .placeholder{color:var(--muted);font-size:13px;text-align:center;padding:20px;}
+.prev-badge{position:absolute;top:12px;left:12px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+.prev-nav{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;z-index:5;transition:all .2s;}
+.prev-nav:hover{background:rgba(201,163,79,0.8);border-color:var(--gold);}
+.prev-nav.left{left:10px;} .prev-nav.right{right:10px;}
+.prev-counter{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.7);color:#fff;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;z-index:5;}
+.prev-thumbs{display:flex;gap:4px;padding:8px 24px;overflow-x:auto;background:var(--card2);border-bottom:1px solid var(--border);}
+.prev-thumb{width:56px;height:40px;border-radius:4px;overflow:hidden;cursor:pointer;border:2px solid transparent;flex-shrink:0;opacity:0.6;transition:all .2s;}
+.prev-thumb.active{border-color:var(--gold);opacity:1;}
+.prev-thumb img{width:100%;height:100%;object-fit:cover;}
+.prev-body{padding:24px;}
+.prev-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold-light);margin-bottom:4px;}
+.prev-loc{color:var(--muted);font-size:13px;margin-bottom:16px;}
+.prev-score-row{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:16px;background:var(--card2);border-radius:10px;border:1px solid var(--border);}
+.prev-score-big{font-family:'Playfair Display',serif;font-size:42px;font-weight:800;}
+.prev-score-meta{flex:1;}
+.prev-score-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);}
+.prev-score-bar{height:6px;background:#1e1e28;border-radius:3px;margin-top:6px;overflow:hidden;}
+.prev-score-fill{height:100%;border-radius:3px;transition:width .4s;}
+.prev-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.prev-stat{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;}
+.prev-stat-val{font-size:18px;font-weight:700;color:var(--text);font-family:'Playfair Display',serif;}
+.prev-stat-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:2px;}
+.prev-desc{margin-bottom:20px;}
+.prev-desc h4{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px;}
+.prev-desc p{font-size:13px;line-height:1.7;color:var(--text);}
+.prev-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px;}
+.prev-tag{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;background:var(--card2);border:1px solid var(--border);color:var(--muted);}
+.prev-link{display:block;text-align:center;padding:12px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#000;font-weight:700;font-size:13px;border-radius:8px;text-decoration:none;letter-spacing:0.5px;margin-top:8px;}
+.prev-link:hover{background:linear-gradient(135deg,var(--gold),var(--gold-light));}
+
+/* INFO PANEL */
+.info-panel{background:var(--card);border:1px solid var(--border);border-radius:10px;margin:16px 32px;padding:24px;}
+.info-panel h3{color:var(--gold);font-family:'Playfair Display',serif;font-size:16px;margin-bottom:10px;}
+.info-panel p{color:var(--muted);font-size:13px;line-height:1.7;}
+
+/* MARKET CHARTS */
+.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 32px;}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;}
+.chart-card h3{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.bar-lbl{width:130px;font-size:11px;color:var(--text);text-align:right;flex-shrink:0;}
+.bar-trk{flex:1;height:18px;background:#1a1a22;border-radius:3px;overflow:hidden;}
+.bar-fl{height:100%;border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:9px;font-weight:700;color:#000;min-width:fit-content;}
+.bar-fl.m{background:var(--blue);} .bar-fl.d{background:var(--green);}
+
+.footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;color:var(--muted);font-size:10px;letter-spacing:0.5px;}
+.hidden{display:none!important;}
+@media(max-width:768px){.chart-row{grid-template-columns:1fr;}.stats-row{gap:12px;}.preview-overlay{width:100%;}}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="logo">
+    <div class="logo-text">
+      <h1>AVENA</h1>
+      <p>Deal Scout</p>
+      <div class="logo-tagline">Curated new builds from <span id="devCountTag" style="color:var(--gold);font-weight:600">30</span> verified developers</div>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-val" id="sTotal">0</div><div class="stat-lbl">Properties</div></div>
+    <div class="stat"><div class="stat-val" id="sAvg">0%</div><div class="stat-lbl">Avg Saving</div></div>
+    <div class="stat"><div class="stat-val" id="sBest">—</div><div class="stat-lbl">Best Score</div></div>
+    <div class="stat"><div class="stat-val" id="sOff">0</div><div class="stat-lbl">Off-Plan</div></div>
+    <div class="stat"><div class="stat-val" id="sDev">0</div><div class="stat-lbl">Developers</div></div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="cg"><label>Region</label><select id="fR"><option value="all">All Regions</option><option value="cb-south">Costa Blanca South</option><option value="cb-north">Costa Blanca North</option><option value="cc">Costa Cálida</option></select></div>
+  <div class="cg"><label>Type</label><select id="fT"><option value="all">All Types</option><option value="Villa">Villas</option><option value="Apartment">Apartments</option><option value="Townhouse">Townhouses</option></select></div>
+  <div class="cg"><label>Max Price (€)</label><input type="number" id="fP" value="1000000" step="50000"></div>
+  <div class="cg"><label>Min Score</label><select id="fS"><option value="0">All</option><option value="80">80+</option><option value="70">70+</option><option value="60">60+</option></select></div>
+  <div class="cg"><label>Status</label><select id="fO"><option value="all">All</option><option value="off-plan">Off-Plan Only</option><option value="under-construction">Under Construction</option><option value="ready">Ready</option></select></div>
+  <div class="cg"><label>Search</label><input type="text" id="fQ" placeholder="Developer, project, area..."></div>
+  <div class="cg"><label>&nbsp;</label><button class="btn" onclick="go()">Filter</button></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-t="deals" onclick="stab('deals')">Deal Rankings</div>
+  <div class="tab" data-t="market" onclick="stab('market')">Market Overview</div>
+  <div class="tab" data-t="about" onclick="stab('about')">Scoring Method</div>
+</div>
+
+<div id="t-deals">
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th data-s="rank" style="width:40px">#</th>
+        <th data-s="score">Score</th>
+        <th data-s="developer">Developer</th>
+        <th data-s="project">Project / Location</th>
+        <th data-s="region">Region</th>
+        <th data-s="type">Type</th>
+        <th data-s="price">Price</th>
+        <th data-s="priceM2">€/m²</th>
+        <th data-s="marketM2">Market</th>
+        <th data-s="discount">Saving</th>
+        <th data-s="built">Built</th>
+        <th data-s="plot">Plot</th>
+        <th data-s="beds">Bed</th>
+        <th data-s="beach">Beach</th>
+        <th data-s="completion">Completion</th>
+        <th data-s="status">Status</th>
+      </tr></thead>
+      <tbody id="tb"></tbody>
+    </table>
+  </div>
+</div>
+
+<div id="t-market" class="hidden">
+  <div class="chart-row">
+    <div class="chart-card"><h3>Avg New Build €/m² by Area (Apartments)</h3><div id="cA"></div></div>
+    <div class="chart-card"><h3>Avg New Build €/m² by Area (Villas)</h3><div id="cV"></div></div>
+  </div>
+  <div class="chart-row">
+    <div class="chart-card"><h3>YoY Price Growth (%)</h3><div id="cG"></div></div>
+    <div class="chart-card"><h3>Best Deal Score by Area</h3><div id="cS"></div></div>
+  </div>
+</div>
+
+<div id="t-about" class="hidden">
+  <div class="info-panel">
+    <h3>How the AVENA Deal Score Works</h3>
+    <p>Each property is scored 0–100 based on multiple weighted factors:</p><br>
+    <p><strong style="color:var(--green)">Price vs Market (40%):</strong> We compare the property's €/m² against the area average for comparable new builds. Properties priced 20%+ below market get maximum points.</p><br>
+    <p><strong style="color:var(--gold)">Off-Plan Potential (20%):</strong> Properties with completion dates 12+ months out in early sales phases get bonus points. Developers need pre-sales to secure bank financing, so early buyers often get 10-25% below eventual market price.</p><br>
+    <p><strong style="color:var(--blue)">Value Density (15%):</strong> For villas: plot size relative to price. For apartments: built m² relative to price. Larger area per euro = higher score.</p><br>
+    <p><strong style="color:#a78bfa">Location Premium (15%):</strong> Beach proximity, golf access, infrastructure quality, and area growth trajectory.</p><br>
+    <p><strong style="color:#f472b6">Developer Track Record (10%):</strong> Years in market, delivery history, reputation. Established developers with 20+ year records score highest.</p><br>
+    <p><strong>Pro Tip:</strong> The best deals are typically off-plan projects 12-24 months from completion, from established developers in areas showing strong YoY growth but still below €2,500/m². Triple benefit: early-bird pricing, capital appreciation during construction, and below-market entry.</p>
+  </div>
+</div>
+
+<!-- PREVIEW PANEL -->
+<div class="preview-overlay" id="preview">
+  <button class="prev-close" onclick="closePreview()">✕</button>
+  <div class="prev-img" id="prevImg">
+    <div class="prev-nav left" onclick="galNav(-1)">‹</div>
+    <div class="prev-nav right" onclick="galNav(1)">›</div>
+    <div class="prev-counter" id="prevCounter">1/6</div>
+  </div>
+  <div class="prev-thumbs" id="prevThumbs"></div>
+  <div class="prev-body">
+    <div id="prevTitle" class="prev-title"></div>
+    <div id="prevLoc" class="prev-loc"></div>
+    <div class="prev-score-row">
+      <div id="prevScoreBig" class="prev-score-big"></div>
+      <div class="prev-score-meta">
+        <div class="prev-score-label">AVENA Deal Score</div>
+        <div class="prev-score-bar"><div id="prevScoreBar" class="prev-score-fill"></div></div>
+      </div>
+      <div id="prevSaving"></div>
+    </div>
+    <div class="prev-grid" id="prevGrid"></div>
+    <div class="prev-tags" id="prevTags"></div>
+    <div class="prev-desc"><h4>Description</h4><p id="prevDesc"></p></div>
+    <div class="prev-desc"><h4>Developer</h4><p id="prevDev"></p></div>
+    <a id="prevLink" class="prev-link" href="#" target="_blank">Visit Developer Website →</a>
+  </div>
+</div>
+
+<div class="footer">AVENA Deal Scout v2.0 — Data sourced from developer websites, Idealista, Tinsa & market reports (March 2026). Prices indicative. Always verify with developer.</div>
+
+<script>
+const D=[
+// COSTA BLANCA SOUTH
+{d:"TM Grupo Inmobiliario",p:"Aire Residencial",l:"Villamartín Golf, Orihuela Costa",r:"cb-south",t:"Apartment",pf:152000,pt:210000,pm2:2100,mm2:3150,bm:85,pl:null,bd:2,ba:2,bk:4,c:"2026-Q4",s:"off-plan",dy:55,f:"Communal pools, jacuzzi, boule courts, parking. Adjacent to Villamartín Golf. Modern design with large terraces and open-plan living. Energy efficient with A-class rating. Underground parking included.",u:"https://www.tmgrupoinmobiliario.com",img:"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=300&fit=crop"},
+{d:"TM Grupo Inmobiliario",p:"Residencial Gala",l:"Villamartín, Orihuela Costa",r:"cb-south",t:"Apartment",pf:195000,pt:290000,pm2:2500,mm2:3150,bm:95,pl:null,bd:3,ba:2,bk:3,c:"2027-Q1",s:"off-plan",dy:55,f:"Close to La Zenia Beach. Modern design with spacious terraces and communal pool. TM Grupo is one of Spain's largest developers with 55+ years in market.",u:"https://www.tmgrupoinmobiliario.com",img:"https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=300&fit=crop"},
+{d:"Grupo Masa",p:"Modern Townhouses",l:"Gran Alacant, Santa Pola",r:"cb-south",t:"Townhouse",pf:191000,pt:240000,pm2:1910,mm2:2735,bm:110,pl:60,bd:3,ba:2,bk:2,c:"2025-Q2",s:"ready",dy:50,f:"Monte y Mar residential area. Energy efficient, contemporary design. 50+ year developer with excellent track record. Walking distance to Carabassí beach.",u:"https://masa.eu",img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=300&fit=crop"},
+{d:"Grupo Masa",p:"Villas with Pools",l:"Gran Alacant, Santa Pola",r:"cb-south",t:"Villa",pf:395000,pt:526000,pm2:2735,mm2:3073,bm:160,pl:300,bd:4,ba:3,bk:2,c:"2026-Q3",s:"off-plan",dy:50,f:"Private pools, solarium, parking. Semi-detached design with modern architecture. Large 300m² plots. Established developer with half a century of experience.",u:"https://masa.eu",img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&h=300&fit=crop"},
+{d:"Urmosa",p:"Santa Pola Apartments",l:"Santa Pola",r:"cb-south",t:"Apartment",pf:185000,pt:275000,pm2:2200,mm2:2600,bm:90,pl:null,bd:2,ba:2,bk:1.5,c:"2026-Q2",s:"off-plan",dy:38,f:"Modern apartments close to Santa Pola beach. 1-3 bedroom options. Communal pool, underground parking. 38 years in the market.",u:"https://urmosa.com",img:"https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=600&h=300&fit=crop"},
+{d:"Urmosa",p:"Molino Blanco",l:"Orihuela Costa",r:"cb-south",t:"Villa",pf:320000,pt:480000,pm2:2400,mm2:3150,bm:150,pl:400,bd:3,ba:2,bk:5,c:"2027-Q1",s:"off-plan",dy:38,f:"Private pool, garden, modern design, energy class A. Large 400m² plots with stunning views. Established developer with proven track record.",u:"https://urmosa.com",img:"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=300&fit=crop"},
+{d:"AEDAS Homes",p:"Amaire Villas 1",l:"Alicante",r:"cb-south",t:"Villa",pf:450000,pt:650000,pm2:2800,mm2:3300,bm:180,pl:350,bd:4,ba:3,bk:6,c:"2027-Q2",s:"off-plan",dy:10,f:"Sustainable A-class energy design, modern architecture. AEDAS is a major publicly listed Spanish developer with operations across the country.",u:"https://www.aedashomes.com",img:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600&h=300&fit=crop"},
+{d:"Salisol",p:"SaliSol Resort",l:"El Raso, Guardamar del Segura",r:"cb-south",t:"Apartment",pf:150000,pt:299000,pm2:1700,mm2:2200,bm:80,pl:null,bd:2,ba:2,bk:1,c:"2026-Q4",s:"off-plan",dy:12,f:"Designer apartments + 5 semi-detached villas. Heated pool, gym, coworking, EV charging. Adjacent to Laguna La Mata nature reserve. Near Guardamar's sandy beaches.",u:"https://salisol.com",img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=300&fit=crop"},
+{d:"Gama Group",p:"Los Balcones Residencial",l:"Los Balcones, Torrevieja",r:"cb-south",t:"Apartment",pf:175000,pt:260000,pm2:2300,mm2:2600,bm:80,pl:null,bd:2,ba:2,bk:3,c:"2026-Q3",s:"under-construction",dy:50,f:"Modern design, rooftop solarium, communal pool. Gama Group has built 11,000+ homes since 1975 across Costa Blanca. Los Balcones is a popular area with shopping nearby.",u:"https://gamagrupo.es",img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=300&fit=crop"},
+// AMAY
+{d:"Amay Properties",p:"Amay Deluxe",l:"Dehesa de Campoamor, Orihuela Costa",r:"cb-south",t:"Villa",pf:975000,pt:1000000,pm2:3900,mm2:3150,bm:250,pl:500,bd:4,ba:3,bk:0.25,c:"2026-Q2",s:"ready",dy:30,f:"Premium villas just 250m from beach! Large 500m² plots, private pool, luxury finishes. Campoamor is one of the most exclusive areas on the southern Costa Blanca.",u:"https://amayproperties.com",img:"https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&h=300&fit=crop"},
+{d:"Amay Properties",p:"Marquesado de Molins",l:"Torre de la Horadada",r:"cb-south",t:"Apartment",pf:230000,pt:310000,pm2:2700,mm2:2800,bm:90,pl:null,bd:2,ba:2,bk:0.5,c:"2027-Q1",s:"off-plan",dy:30,f:"5 min walk to beach in the charming coastal town of Torre de la Horadada. Modern design, communal pool. 30+ years developer experience.",u:"https://amayproperties.com",img:"https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=600&h=300&fit=crop"},
+{d:"Amay Properties",p:"Las Maravillas",l:"Punta Prima, Orihuela Costa",r:"cb-south",t:"Villa",pf:450000,pt:620000,pm2:2800,mm2:3150,bm:180,pl:176,bd:3,ba:3,bk:1,c:"2026-Q4",s:"off-plan",dy:30,f:"Coastal Punta Prima location. Modern villas with quality finishes. Close to the famous Punta Prima beach promenade and commercial center.",u:"https://amayproperties.com",img:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600&h=300&fit=crop"},
+// TRIVEE
+{d:"Trivee",p:"Villa Saria",l:"La Finca Golf Resort, Algorfa",r:"cb-south",t:"Villa",pf:212000,pt:260000,pm2:1600,mm2:2200,bm:140,pl:445,bd:3,ba:2,bk:14,c:"2026-Q2",s:"under-construction",dy:40,f:"Exceptional value! Huge 445m² plot at La Finca Golf Resort. 3-bed villa from just €212k. 5 golf courses nearby. Trivee has 40+ years of construction experience (ex-Quara Golf Resorts).",u:"https://trivee.com",img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=300&fit=crop"},
+{d:"Trivee",p:"Zante Apartments",l:"La Finca Golf Resort (Mar Egeo)",r:"cb-south",t:"Apartment",pf:177000,pt:254000,pm2:2100,mm2:2200,bm:85,pl:null,bd:2,ba:2,bk:14,c:"2026-Q3",s:"off-plan",dy:40,f:"Golf resort living from €177k. 2-3 bed options. Resort pools, restaurants, spa. La Finca is one of the Costa Blanca's premier golf destinations.",u:"https://trivee.com",img:"https://images.unsplash.com/photo-1515263487990-61b07816b324?w=600&h=300&fit=crop"},
+{d:"Trivee",p:"Residencial Boavista",l:"Villamartín, Orihuela Costa",r:"cb-south",t:"Apartment",pf:189000,pt:260000,pm2:2400,mm2:3150,bm:80,pl:null,bd:2,ba:2,bk:5,c:"2026-Q2",s:"under-construction",dy:40,f:"From €189k in Villamartín! Near golf courses, shops, restaurants. Penthouses also available. The Villamartín Plaza area is one of the most lively expat communities.",u:"https://trivee.com",img:"https://images.unsplash.com/photo-1600573472592-401b489a3cdc?w=600&h=300&fit=crop"},
+{d:"Trivee",p:"Semi-detached EUA Plus",l:"La Finca Golf Resort",r:"cb-south",t:"Townhouse",pf:419000,pt:460000,pm2:2800,mm2:2500,bm:150,pl:200,bd:3,ba:2,bk:14,c:"2026-Q3",s:"under-construction",dy:40,f:"Semi-detached at La Finca Golf. High spec finishes, resort lifestyle with golf, pools, and spa.",u:"https://trivee.com",img:"https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=600&h=300&fit=crop"},
+{d:"Trivee",p:"Residencial Bali",l:"Punta Prima (La Ceñuela)",r:"cb-south",t:"Apartment",pf:549000,pt:650000,pm2:6100,mm2:3500,bm:90,pl:null,bd:2,ba:2,bk:0.3,c:"2026-Q4",s:"under-construction",dy:40,f:"Ultra-premium beachfront in Punta Prima. Sea views, luxury finishes. This is top-tier location commanding premium prices.",u:"https://trivee.com",img:"https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=600&h=300&fit=crop"},
+// ORBESOL
+{d:"Orbesol",p:"Villa Enya (La Marina)",l:"La Marina, San Fulgencio",r:"cb-south",t:"Villa",pf:309900,pt:330000,pm2:2384,mm2:2500,bm:130,pl:180,bd:3,ba:2,bk:5,c:"2026-Q2",s:"under-construction",dy:15,f:"Modern villas at La Marina. 130m² built on 180m² plot. Near the famous sand dunes and nature park of Guardamar.",u:"https://orbesol.com",img:"https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&h=300&fit=crop"},
+{d:"Orbesol",p:"Santa Rosalía Resort",l:"Torre Pacheco, Costa Cálida",r:"cc",t:"Apartment",pf:380000,pt:529000,pm2:3800,mm2:2200,bm:100,pl:null,bd:3,ba:2,bk:20,c:"2026-Q3",s:"under-construction",dy:15,f:"Resort complex with artificial lake, pools, sports facilities. 76% already sold. Premium resort lifestyle in Costa Cálida.",u:"https://orbesol.com",img:"https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=600&h=300&fit=crop"},
+// NAVASAEZ
+{d:"Navasaez",p:"Vista Azul XXVIII",l:"Punta Prima, Orihuela Costa",r:"cb-south",t:"Apartment",pf:284900,pt:344900,pm2:3250,mm2:3500,bm:90,pl:null,bd:2,ba:2,bk:1,c:"2026-Q3",s:"under-construction",dy:40,f:"66-109m² options. Pool, gym, sauna, jacuzzi! Penthouses available. Brothers Sáez Navarrete founded Navasaez in 1999 with 40+ years combined experience.",u:"https://navasaez.com",img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=300&fit=crop"},
+{d:"Navasaez",p:"Vista Azul XXXV (Lo Romero Golf)",l:"Lo Romero Golf, Pilar de la Horadada",r:"cb-south",t:"Villa",pf:380000,pt:550000,pm2:2500,mm2:2800,bm:170,pl:350,bd:3,ba:3,bk:4,c:"2026-Q4",s:"under-construction",dy:40,f:"Golf-front villas at Lo Romero course. 40+ years builder experience. Near Las Higuericas beach.",u:"https://navasaez.com",img:"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=300&fit=crop"},
+// PRAXA
+{d:"Praxa Real Estate",p:"Riviera Ciudad Quesada",l:"Ciudad Quesada",r:"cb-south",t:"Villa",pf:420000,pt:580000,pm2:2800,mm2:2800,bm:160,pl:350,bd:3,ba:2,bk:8,c:"2027-Q1",s:"off-plan",dy:30,f:"41 exclusive villas with 7x3m pool, 66m² solarium. Views of Mata-Torrevieja Natural Park. Award-winning architects, 30+ years experience.",u:"https://praxarealestate.es",img:"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=300&fit=crop"},
+{d:"Praxa Real Estate",p:"Lagoon Top Villas",l:"Mata-Torrevieja Natural Park",r:"cb-south",t:"Villa",pf:480000,pt:700000,pm2:3000,mm2:2800,bm:180,pl:400,bd:3,ba:3,bk:6,c:"2027-Q2",s:"off-plan",dy:30,f:"38 luxury villas on top of the Natural Park. Spectacular lagoon and sea views. Highest quality materials, sustainable design.",u:"https://praxarealestate.es",img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&h=300&fit=crop"},
+// MORENO
+{d:"Moreno & Partners",p:"Orihuela Costa Waterfront",l:"Punta Prima - Playa Flamenca",r:"cb-south",t:"Apartment",pf:280000,pt:450000,pm2:3200,mm2:3150,bm:100,pl:null,bd:2,ba:2,bk:0.5,c:"2028-Q1",s:"off-plan",dy:25,f:"Part of largest Orihuela Costa project in a decade: 456,000m² masterplan, 1.2km waterfront, 1,500+ homes planned. Early off-plan = maximum upside.",u:"https://morenoandpartners.net",img:"https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=600&h=300&fit=crop"},
+{d:"Moreno & Partners",p:"Waterfront Villas",l:"Cabo Peñas, Orihuela Costa",r:"cb-south",t:"Villa",pf:550000,pt:900000,pm2:3100,mm2:3150,bm:200,pl:400,bd:3,ba:3,bk:0.3,c:"2028-Q2",s:"off-plan",dy:25,f:"Premium villas in mega-project. Flora/fauna reserves, adaptive living concept. Just 300m from the sea.",u:"https://morenoandpartners.net",img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=300&fit=crop"},
+// DULY INVESTMENT
+{d:"Duly Investment",p:"Amanecer VII",l:"Orihuela Costa",r:"cb-south",t:"Apartment",pf:169000,pt:220000,pm2:2200,mm2:3150,bm:78,pl:null,bd:2,ba:2,bk:3,c:"2026-Q3",s:"under-construction",dy:20,f:"28 bungalow-style apartments. Ground floor with front/rear terraces, upper floor with private solarium. Pool, padel, parking. Fully furnished & equipped.",u:"https://dulyinvestment.com",img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=300&fit=crop"},
+{d:"Duly Investment",p:"Amanecer VIII — Villas",l:"Orihuela Costa",r:"cb-south",t:"Villa",pf:380000,pt:520000,pm2:2700,mm2:3150,bm:150,pl:400,bd:3,ba:3,bk:0.3,c:"2026-Q4",s:"off-plan",dy:20,f:"Only 7-8 exclusive villas just 300m from the sea! Private pools, plots up to 400m². Premium beachside location.",u:"https://dulyinvestment.com",img:"https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&h=300&fit=crop"},
+{d:"Duly Investment",p:"Amanecer X",l:"Orihuela Costa",r:"cb-south",t:"Apartment",pf:299000,pt:360000,pm2:3972,mm2:3150,bm:78,pl:null,bd:2,ba:2,bk:2.5,c:"2026-Q2",s:"under-construction",dy:20,f:"108 apartments. Large terraces, fully furnished with ducted A/C, all appliances included. Turnkey ready.",u:"https://dulyinvestment.com",img:"https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=600&h=300&fit=crop"},
+{d:"Duly Investment",p:"Amanecer XI",l:"Villamartín, Orihuela Costa",r:"cb-south",t:"Apartment",pf:239000,pt:290000,pm2:2750,mm2:3150,bm:88,pl:null,bd:2,ba:2,bk:4,c:"2026-Q4",s:"off-plan",dy:20,f:"112 maisonettes in 8 blocks. Near 2 golf courses & Villamartín Plaza. Pool, gym, gardens. All furnished.",u:"https://dulyinvestment.com",img:"https://images.unsplash.com/photo-1600573472592-401b489a3cdc?w=600&h=300&fit=crop"},
+{d:"Duly Investment",p:"Amanecer XII — Spa",l:"Orihuela Costa",r:"cb-south",t:"Apartment",pf:259000,pt:310000,pm2:2950,mm2:3150,bm:88,pl:null,bd:2,ba:2,bk:3,c:"2027-Q1",s:"off-plan",dy:20,f:"112 apartments with SPA including gym, sauna, jacuzzi. Complete furnishing pack with Smart TV, linens, kitchen utensils. Turnkey luxury.",u:"https://dulyinvestment.com",img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=300&fit=crop"},
+{d:"Duly Investment",p:"San Miguel de Salinas",l:"San Miguel de Salinas",r:"cb-south",t:"Apartment",pf:219000,pt:260000,pm2:3130,mm2:2800,bm:72,pl:null,bd:2,ba:2,bk:8,c:"2026-12",s:"off-plan",dy:20,f:"110 apartments (Phase 1: 68 units). Fully furnished & equipped, underground parking, storage. Phase 2 delivers April 2027.",u:"https://dulyinvestment.com",img:"https://images.unsplash.com/photo-1515263487990-61b07816b324?w=600&h=300&fit=crop"},
+{d:"Duly Investment",p:"La Hoya",l:"Torrevieja",r:"cb-south",t:"Apartment",pf:274000,pt:320000,pm2:3383,mm2:2600,bm:81,pl:null,bd:2,ba:2,bk:4,c:"2027-Q2",s:"off-plan",dy:20,f:"120 apartments in 7 blocks in Torrevieja's new La Hoya district. Padel, pools, BBQ areas, playground. Near the famous Pink Lagoon.",u:"https://dulyinvestment.com",img:"https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=300&fit=crop"},
+{d:"Duly Investment",p:"Lo Marabú Bungalows",l:"Ciudad Quesada",r:"cb-south",t:"Apartment",pf:279000,pt:330000,pm2:3100,mm2:2800,bm:90,pl:null,bd:2,ba:2,bk:8,c:"2026-Q3",s:"under-construction",dy:20,f:"84 bungalows. Ground floor: 40m² private garden. Top floor: 66m² rooftop terrace. Fully furnished. 10 min to Guardamar beaches.",u:"https://dulyinvestment.com",img:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600&h=300&fit=crop"},
+{d:"Duly Investment",p:"Lo Marabú Villas",l:"Ciudad Quesada",r:"cb-south",t:"Villa",pf:496000,pt:514000,pm2:4635,mm2:3150,bm:107,pl:200,bd:3,ba:2,bk:8,c:"2026-Q4",s:"under-construction",dy:20,f:"Semi-detached Villa Nova model. Private pool (18m²), 50m² solarium, garage + storage. High-quality finishes throughout.",u:"https://dulyinvestment.com",img:"https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=600&h=300&fit=crop"},
+// COSTA BLANCA NORTH
+{d:"Taylor Wimpey España",p:"Sora",l:"La Pedrera, Dénia",r:"cb-north",t:"Apartment",pf:315000,pt:470000,pm2:3200,mm2:3800,bm:105,pl:null,bd:2,ba:2,bk:2,c:"2027-09",s:"off-plan",dy:65,f:"86 homes in 6 buildings. Pools, gardens, play park. A-class energy with solar panels. Taylor Wimpey is one of the world's largest developers with 65+ years.",u:"https://taylorwimpeyspain.com",img:"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=300&fit=crop"},
+{d:"Taylor Wimpey España",p:"Nature",l:"Balcón de Finestrat",r:"cb-north",t:"Townhouse",pf:425000,pt:525000,pm2:2900,mm2:2800,bm:155,pl:120,bd:3,ba:2,bk:6,c:"2027-Q3",s:"off-plan",dy:65,f:"38 contemporary townhouses with gardens. Mountain and partial sea views. Modern design with quality finishes throughout.",u:"https://taylorwimpeyspain.com",img:"https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=600&h=300&fit=crop"},
+{d:"Allonbay",p:"Allonbay Urban",l:"Villajoyosa / Benidorm",r:"cb-north",t:"Apartment",pf:249000,pt:254000,pm2:4016,mm2:3617,bm:62,pl:null,bd:1,ba:1,bk:0.1,c:"2026-Q2",s:"under-construction",dy:12,f:"Just 100m from the sea! Landscaped gardens, communal pools. Beachfront living at its finest. Perfect investment property.",u:"https://allonbay.com",img:"https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=600&h=300&fit=crop"},
+{d:"Allonbay",p:"Allonbay Village",l:"Villajoyosa / Benidorm",r:"cb-north",t:"Townhouse",pf:407000,pt:453500,pm2:3500,mm2:3617,bm:120,pl:80,bd:2,ba:2,bk:0.3,c:"2026-Q4",s:"under-construction",dy:12,f:"Townhouses and duplex penthouses with private pools. Walking distance to beaches. Modern Mediterranean style.",u:"https://allonbay.com",img:"https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&h=300&fit=crop"},
+{d:"Grupo VAPF",p:"Lirios Design",l:"Benitachell (Cumbre del Sol)",r:"cb-north",t:"Villa",pf:650000,pt:950000,pm2:3200,mm2:3800,bm:240,pl:900,bd:3,ba:3,bk:2,c:"2027-Q2",s:"off-plan",dy:62,f:"Luxury villas in the prestigious Cumbre del Sol residential estate. Sea views, infinity pools, premium finishes. 62+ years developer heritage.",u:"https://www.vapf.com",img:"https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&h=300&fit=crop"},
+{d:"Grupo VAPF",p:"Calpe Villas",l:"La Canuta, Calpe",r:"cb-north",t:"Villa",pf:560000,pt:850000,pm2:3100,mm2:4000,bm:200,pl:800,bd:3,ba:3,bk:3,c:"2027-Q1",s:"off-plan",dy:62,f:"Modern design with spectacular sea views, private pool, landscaped garden. Calpe with its iconic Peñón de Ifach rock is a premium location.",u:"https://www.vapf.com",img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&h=300&fit=crop"},
+{d:"Levante Homes",p:"La Nucia Hills",l:"La Nucia",r:"cb-north",t:"Villa",pf:350000,pt:500000,pm2:2200,mm2:2726,bm:180,pl:500,bd:3,ba:2,bk:8,c:"2027-Q1",s:"off-plan",dy:56,f:"Mountain views, private pool, large 500m² plots. Levante Homes (est. 1970) has 56 years of experience. Smart home features, sea views. 15 min to Benidorm.",u:"https://levantehomes.com",img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=300&fit=crop"},
+{d:"Alibuilding",p:"Polop Hills Nature",l:"Polop",r:"cb-north",t:"Villa",pf:295000,pt:420000,pm2:1900,mm2:2500,bm:155,pl:550,bd:3,ba:2,bk:12,c:"2027-Q2",s:"off-plan",dy:10,f:"65 customizable homes on 300-580m² plots. Panoramic views of Benidorm-Altea coastline and Ponoig mountain. Alibuilding specializes in 'à la carte' home design.",u:"https://alibuilding.com",img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=300&fit=crop"},
+// NEW: NEINOR HOMES
+{d:"Neinor Homes",p:"Lagune Homes",l:"Calpe",r:"cb-north",t:"Apartment",pf:350000,pt:520000,pm2:2600,mm2:4665,bm:190,pl:null,bd:2,ba:2,bk:0.5,c:"2026-09",s:"under-construction",dy:30,f:"140 homes in 2x11-storey buildings. Adult & children's pool, paddle tennis, gourmet room. 5 min walk to Fossa beach. €16M investment. Major listed developer.",u:"https://www.neinorhomes.com",img:"https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&h=300&fit=crop"},
+// NEW: IMMOSOL
+{d:"Immosol",p:"Luz 2 Balcón de Finestrat",l:"Finestrat",r:"cb-north",t:"Townhouse",pf:379900,pt:429900,pm2:1854,mm2:2800,bm:190,pl:null,bd:3,ba:2,bk:2,c:"2026-Q4",s:"off-plan",dy:28,f:"Luxury terraced homes with 100m²+ terraces. Options for private pool. 2 min to beach, 5 min to golf, 20 min to airport. 1,200 homes under construction across 5 projects.",u:"https://www.immosol.com",img:"https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=600&h=300&fit=crop"},
+{d:"Immosol",p:"La Finca Luxury Villas",l:"La Finca Golf, Algorfa",r:"cb-south",t:"Villa",pf:450000,pt:600000,pm2:2800,mm2:2500,bm:180,pl:500,bd:4,ba:3,bk:14,c:"2027-Q1",s:"off-plan",dy:28,f:"8 luxury villas with large terraces and swimming pools at La Finca Golf Resort. 28+ years of development experience across Costa Blanca.",u:"https://www.immosol.com",img:"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=300&fit=crop"},
+// NEW: ESPHOUSES
+{d:"ESPHOUSES",p:"Seaview 6 Phase 1",l:"Sierra Cortina, Finestrat",r:"cb-north",t:"Villa",pf:420000,pt:550000,pm2:2800,mm2:2800,bm:160,pl:300,bd:3,ba:3,bk:3,c:"2026-Q3",s:"under-construction",dy:20,f:"11 semi-detached villas in Sierra Cortina. 5 min to Benidorm. Pre-ducted A/C, home automation, high energy efficiency. 20+ year developer.",u:"https://developer.esphouses.co.uk",img:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600&h=300&fit=crop"},
+{d:"ESPHOUSES",p:"Seaview 6 Phase 2",l:"Sierra Cortina, Finestrat",r:"cb-north",t:"Villa",pf:480000,pt:650000,pm2:3000,mm2:2800,bm:180,pl:350,bd:4,ba:3,bk:3,c:"2026-08",s:"under-construction",dy:20,f:"8 detached villas. Private pools, optional basement, large terraces. Delivery August 2026. Stunning views over Benidorm skyline.",u:"https://developer.esphouses.co.uk",img:"https://images.unsplash.com/photo-1613977257363-707ba9348227?w=600&h=300&fit=crop"},
+{d:"ESPHOUSES",p:"Aquamarine Villas",l:"Guardamar del Segura",r:"cb-south",t:"Villa",pf:380000,pt:520000,pm2:2400,mm2:2200,bm:175,pl:600,bd:3,ba:3,bk:3,c:"2027-Q1",s:"off-plan",dy:20,f:"12 luxury detached villas on huge 600m² plots. Just 3km from Guardamar's beautiful beaches. High-quality finishes throughout.",u:"https://developer.esphouses.co.uk",img:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600&h=300&fit=crop"},
+// NEW: METROVACESA
+{d:"Metrovacesa",p:"Abelia Residencial",l:"Benalúa, Alicante",r:"cb-south",t:"Apartment",pf:423700,pt:500000,pm2:2918,mm2:3300,bm:145,pl:null,bd:3,ba:2,bk:2,c:"2026-Q4",s:"under-construction",dy:100,f:"46 homes with rooftop pool and sea/city views. A-class energy. Customizable finishes. Metrovacesa is Spain's oldest developer — founded 1918, over 100 years of heritage.",u:"https://metrovacesa.com",img:"https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=600&h=300&fit=crop"},
+// NEW: MPC GROUP
+{d:"MPC Group",p:"Pórtico Plaza II",l:"Bulevar del Plà, Alicante",r:"cb-south",t:"Apartment",pf:269000,pt:380000,pm2:2500,mm2:3300,bm:110,pl:null,bd:2,ba:2,bk:4,c:"2026-Q3",s:"under-construction",dy:32,f:"55 modern homes. Pool, gardens, gym, play area. Garage & storage included. TRAM access to beaches. 33% reserved in first days! 32 years of experience.",u:"https://mpc-group.es",img:"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&h=300&fit=crop"},
+// NEW: OKEY VIVIENDAS
+{d:"Okey Viviendas",p:"Lo Pagán Exclusive Villas",l:"Lo Pagán, San Pedro del Pinatar",r:"cc",t:"Villa",pf:290000,pt:420000,pm2:2100,mm2:2400,bm:150,pl:300,bd:3,ba:2,bk:1,c:"2026-Q4",s:"off-plan",dy:38,f:"One-floor exclusive villas with private pool. 38+ years experience (since 1986), 1,800+ homes delivered. Near Mar Menor & Mediterranean beaches.",u:"https://okeyviviendas.com",img:"https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=600&h=300&fit=crop"},
+// COSTA CALIDA
+{d:"Taylor Wimpey España",p:"Siena @ La Manga Club",l:"La Manga del Mar Menor",r:"cc",t:"Apartment",pf:395000,pt:550000,pm2:3500,mm2:2800,bm:120,pl:null,bd:3,ba:2,bk:2,c:"2028-02",s:"off-plan",dy:65,f:"La Manga Club resort — one of Europe's premier sports resorts. Golf, pools, spa. Phase 2 will include townhouses and villas. €26M investment.",u:"https://taylorwimpeyspain.com",img:"https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=600&h=300&fit=crop"},
+{d:"Grupo Fuertes",p:"Villa Atenea Phase 1",l:"Condado de Alhama",r:"cc",t:"Villa",pf:237500,pt:335000,pm2:1750,mm2:2200,bm:150,pl:350,bd:3,ba:2,bk:30,c:"2026-Q2",s:"under-construction",dy:40,f:"15 villas in Alhama Nature Resort. Jack Nicklaus-designed 18-hole golf course, 24 pools, tennis, padel. The resort lifestyle at inland prices.",u:"https://qualityhomescostacalida.com",img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=300&fit=crop"},
+{d:"Grupo Fuertes",p:"Villa Atenea Phase 2",l:"Condado de Alhama",r:"cc",t:"Villa",pf:271900,pt:416900,pm2:1900,mm2:2200,bm:165,pl:365,bd:3,ba:3,bk:30,c:"2027-Q1",s:"off-plan",dy:40,f:"11 villas with PRIVATE POOL INCLUDED in the price. 365m² plots. Golf resort amenities. Excellent value for villa with pool.",u:"https://qualityhomescostacalida.com",img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=300&fit=crop"},
+{d:"Grupo Fuertes",p:"Mirador Apartments",l:"Condado de Alhama",r:"cc",t:"Apartment",pf:110500,pt:151500,pm2:1550,mm2:2000,bm:80,pl:null,bd:2,ba:2,bk:30,c:"2026-Q1",s:"under-construction",dy:40,f:"64 front-line golf apartments — the CHEAPEST new build in the entire region! From just €110,500 for a 2-bed modern apartment. Incredible entry point.",u:"https://qualityhomescostacalida.com",img:"https://images.unsplash.com/photo-1515263487990-61b07816b324?w=600&h=300&fit=crop"},
+{d:"Calida Homes",p:"Sol y Golf Villas",l:"Torre Pacheco",r:"cc",t:"Villa",pf:250000,pt:350000,pm2:2000,mm2:2200,bm:140,pl:300,bd:3,ba:2,bk:10,c:"2026-Q3",s:"under-construction",dy:15,f:"Semi-detached villas with private garden, BBQ area, solarium, optional pool. 10 min to Mar Menor beaches.",u:"https://calidahomes.com",img:"https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=600&h=300&fit=crop"},
+{d:"Calida Homes",p:"Sol y Vida Apartments",l:"Torre Pacheco",r:"cc",t:"Apartment",pf:160000,pt:240000,pm2:1800,mm2:2000,bm:100,pl:null,bd:2,ba:2,bk:10,c:"2026-Q2",s:"under-construction",dy:15,f:"22 exclusive apartments with parking, solarium, communal pool. Great value in Costa Cálida.",u:"https://calidahomes.com",img:"https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=600&h=300&fit=crop"},
+{d:"Roda Golf Resort",p:"Roda Golf Villas",l:"Los Alcázares, Mar Menor",r:"cc",t:"Villa",pf:350000,pt:500000,pm2:2400,mm2:2500,bm:160,pl:400,bd:3,ba:2,bk:2,c:"2026-Q4",s:"off-plan",dy:20,f:"8 exclusive villas on PGA 18-hole course. 24hr security, private pool. 2km from Mar Menor with Los Alcázares town amenities.",u:"",img:"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=300&fit=crop"},
+{d:"Profusa",p:"Santiago de la Ribera TH",l:"Santiago de la Ribera, Mar Menor",r:"cc",t:"Townhouse",pf:243000,pt:355000,pm2:2300,mm2:2500,bm:120,pl:100,bd:3,ba:3,bk:0.6,c:"2026-Q4",s:"off-plan",dy:48,f:"Contemporary townhouses 650m from beach. Private pools, solariums, summer kitchens. Profusa (est. 1977) is a historic Murcia developer with integrated land management.",u:"https://profusa.es",img:"https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=600&h=300&fit=crop"},
+{d:"Sierra Minera",p:"Lo Pagán Sunset Villas",l:"Lo Pagán, San Pedro del Pinatar",r:"cc",t:"Villa",pf:280000,pt:380000,pm2:2100,mm2:2400,bm:142,pl:275,bd:3,ba:2,bk:1,c:"2026-Q3",s:"off-plan",dy:25,f:"98m² built + 44m² solarium on 260-290m² plot. Private pool, high finishes. Sierra Minera develops across the Murcia region. Lo Pagán: mud baths & Mar Menor.",u:"https://sierraminera.com",img:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600&h=300&fit=crop"},
+{d:"Taray Development",p:"Taray: Oasis & Golf",l:"Camposol, Mazarrón",r:"cc",t:"Villa",pf:195000,pt:310000,pm2:1500,mm2:2000,bm:157,pl:400,bd:2,ba:2,bk:14,c:"2027-Q3",s:"off-plan",dy:8,f:"69-home boutique gated community. Full basement included! Communal pool, golf nearby. Incredible value — 157m² villa with 400m² plot from €195k.",u:"",img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=300&fit=crop"},
+{d:"Inmobiliaria Proser",p:"El Alamillo Villas",l:"El Alamillo, Puerto de Mazarrón",r:"cc",t:"Villa",pf:380000,pt:520000,pm2:2500,mm2:2600,bm:170,pl:350,bd:4,ba:3,bk:0.15,c:"2026-Q2",s:"under-construction",dy:27,f:"150m from Playa Negra! 11 luxury villas, 4-level design with basement & rooftop jacuzzi. Private pool (8x3.5m). Proser (est. 1999) has 27 years experience.",u:"https://proser.es",img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&h=300&fit=crop"},
+{d:"Costa Cálida Promotores",p:"Pilar de la Horadada Villas",l:"Pilar de la Horadada",r:"cc",t:"Villa",pf:350000,pt:480000,pm2:2200,mm2:2500,bm:170,pl:400,bd:3,ba:2,bk:2,c:"2026-Q4",s:"off-plan",dy:40,f:"Private pool, 2km to Las Higuericas beach. Costa Cálida Promotores (since 1986) has built thousands of homes across the Murcia/Alicante region.",u:"https://grupocostacalida.com",img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=300&fit=crop"}
+];
+
+// MARKET DATA
+const mkt={
+apt:[{a:"Calpe Premium",v:4665},{a:"Benidorm Beach",v:4491},{a:"Jávea",v:4000},{a:"Dénia",v:3800},{a:"Altea",v:3500},{a:"Alicante City",v:3300},{a:"Orihuela Costa",v:3150},{a:"Gran Alacant",v:3073},{a:"Torrevieja",v:2336},{a:"Guardamar",v:2200},{a:"Mar Menor",v:1950},{a:"Torre Pacheco",v:2000},{a:"Mazarrón",v:1800},{a:"Condado Alhama",v:1550}],
+vil:[{a:"Jávea",v:4500},{a:"Altea Hills",v:4100},{a:"Moraira",v:4000},{a:"Calpe",v:4000},{a:"Alicante",v:3300},{a:"Orihuela Costa",v:3150},{a:"Gran Alacant",v:2735},{a:"Finestrat",v:2800},{a:"La Nucia",v:2726},{a:"Polop",v:2500},{a:"Torrevieja",v:2300},{a:"Mar Menor",v:2500},{a:"Torre Pacheco",v:2200},{a:"Mazarrón",v:2000},{a:"Condado Alhama",v:1750}],
+grw:[{a:"Los Alcázares",v:22},{a:"Benidorm",v:16},{a:"San Javier",v:16},{a:"Gran Alacant",v:13.4},{a:"Alicante City",v:13.2},{a:"Orihuela Costa",v:12.5},{a:"Torrevieja",v:12},{a:"Dénia",v:10},{a:"Jávea",v:10},{a:"Mazarrón",v:8},{a:"Guardamar",v:7},{a:"Calpe",v:6}]
+};
+
+// SCORING
+function calcScore(d){
+  let s=0;
+  if(d.mm2>0&&d.pm2>0){const df=(d.mm2-d.pm2)/d.mm2;if(df>=.25)s+=40;else if(df>=.20)s+=36;else if(df>=.15)s+=32;else if(df>=.10)s+=26;else if(df>=.05)s+=20;else if(df>=0)s+=12;else s+=Math.max(0,12+df*40);}
+  if(d.s==='off-plan'){s+=14;if(d.c&&d.c.includes('2027'))s+=4;if(d.c&&d.c.includes('2028'))s+=6;}else if(d.s==='under-construction')s+=8;else s+=2;
+  if(d.pl&&d.pl>0){const pp=d.pf/d.pl;if(pp<600)s+=15;else if(pp<800)s+=12;else if(pp<1000)s+=9;else if(pp<1500)s+=6;else s+=3;}else if(d.bm&&d.pf){const rt=d.bm/(d.pf/100000);if(rt>50)s+=13;else if(rt>40)s+=10;else if(rt>30)s+=7;else s+=4;}
+  if(d.bk!==null){if(d.bk<=.5)s+=15;else if(d.bk<=2)s+=12;else if(d.bk<=5)s+=9;else if(d.bk<=10)s+=6;else s+=3;}
+  if(d.dy>=50)s+=10;else if(d.dy>=30)s+=8;else if(d.dy>=15)s+=6;else if(d.dy>=8)s+=4;else s+=2;
+  return Math.min(100,Math.round(s));
+}
+
+let sort={k:'score',d:'desc'},filtered=[];
+function disc(d){return d.mm2&&d.pm2?(d.mm2-d.pm2)/d.mm2*100:0;}
+function scCls(s){return s>=80?'ex':s>=70?'gr':s>=60?'gd':s>=50?'fr':'av';}
+function rLbl(r){return r==='cb-south'?'CB South':r==='cb-north'?'CB North':'C. Cálida';}
+function rCls(r){return r==='cb-south'?'rt-s':r==='cb-north'?'rt-n':'rt-c';}
+function tCls(t){return t==='Villa'?'tt-v':t==='Townhouse'?'tt-t':'tt-a';}
+function stTag(s){return s==='off-plan'?'<span class="dt op">Off-Plan</span>':s==='under-construction'?'<span class="dt warm">Building</span>':'<span class="dt cool">Ready</span>';}
+function dTag(p){return p>=20?`<span class="dt hot">-${p.toFixed(0)}%</span>`:p>=10?`<span class="dt warm">-${p.toFixed(0)}%</span>`:p>=0?`<span class="dt cool">-${p.toFixed(0)}%</span>`:`<span class="dt" style="background:rgba(239,68,68,0.1);color:#ef4444">+${Math.abs(p).toFixed(0)}%</span>`;}
+function fP(n){return'€'+n.toLocaleString('en');}
+function scColor(s){return s>=80?'#10b981':s>=70?'#34d399':s>=60?'var(--gold)':s>=50?'#f97316':'var(--muted)';}
+
+function go(){
+  const r=document.getElementById('fR').value,t=document.getElementById('fT').value,mp=parseInt(document.getElementById('fP').value)||1e6,ms=parseInt(document.getElementById('fS').value)||0,st=document.getElementById('fO').value,q=document.getElementById('fQ').value.toLowerCase();
+  filtered=D.filter(d=>{
+    if(r!=='all'&&d.r!==r)return false;if(t!=='all'&&d.t!==t)return false;if(d.pf>mp)return false;if(d._sc<ms)return false;if(st!=='all'&&d.s!==st)return false;
+    if(q){const h=(d.d+d.p+d.l+d.t+d.f).toLowerCase();if(!h.includes(q))return false;}
+    return true;
+  });
+  doSort();render();stats();
+}
+function doSort(){
+  const k=sort.k,dr=sort.d==='asc'?1:-1;
+  filtered.sort((a,b)=>{let va,vb;switch(k){case'score':va=a._sc;vb=b._sc;break;case'price':va=a.pf;vb=b.pf;break;case'priceM2':va=a.pm2;vb=b.pm2;break;case'marketM2':va=a.mm2;vb=b.mm2;break;case'discount':va=disc(a);vb=disc(b);break;case'built':va=a.bm||0;vb=b.bm||0;break;case'plot':va=a.pl||0;vb=b.pl||0;break;case'beds':va=a.bd||0;vb=b.bd||0;break;case'beach':va=a.bk!==null?a.bk:999;vb=b.bk!==null?b.bk:999;break;case'developer':return dr*a.d.localeCompare(b.d);case'project':return dr*a.p.localeCompare(b.p);default:va=a._sc;vb=b._sc;}return dr*(va-vb);});
+}
+function render(){
+  const tb=document.getElementById('tb');tb.innerHTML='';
+  filtered.forEach((d,i)=>{
+    const rk=i+1,dc=disc(d),rc=rk<=3?'r'+rk:'';
+    const tr=document.createElement('tr');tr.className=rc;tr.dataset.idx=D.indexOf(d);
+    tr.onclick=function(){openPreview(parseInt(this.dataset.idx));};
+    tr.innerHTML=`<td><span class="rb">${rk}</span></td><td><span class="sc ${scCls(d._sc)}">${d._sc}</span></td><td><span class="dev">${d.d}</span></td><td><span class="pn">${d.p}</span><br><span class="loc">${d.l}</span></td><td><span class="rt ${rCls(d.r)}">${rLbl(d.r)}</span></td><td><span class="tt ${tCls(d.t)}">${d.t}</span></td><td><span class="pm">${fP(d.pf)}</span>${d.pt&&d.pt!==d.pf?`<br><span style="color:var(--muted);font-size:10px">to ${fP(d.pt)}</span>`:''}</td><td style="font-weight:700">€${d.pm2.toLocaleString()}</td><td style="color:var(--muted);font-style:italic">€${d.mm2.toLocaleString()}</td><td>${dTag(dc)}</td><td>${d.bm?d.bm+'m²':'—'}</td><td>${d.pl?d.pl+'m²':'—'}</td><td>${d.bd||'—'}</td><td>🏖️ ${d.bk!==null?d.bk+'km':'—'}</td><td>${d.c||'—'}</td><td>${stTag(d.s)}</td>`;
+    tb.appendChild(tr);
+  });
+  document.querySelectorAll('thead th').forEach(th=>{th.classList.remove('sa','sd');if(th.dataset.s===sort.k)th.classList.add(sort.d==='asc'?'sa':'sd');});
+}
+function stats(){
+  document.getElementById('sTotal').textContent=filtered.length;
+  const avg=filtered.length?filtered.reduce((s,d)=>s+Math.max(0,disc(d)),0)/filtered.length:0;
+  document.getElementById('sAvg').textContent=avg.toFixed(0)+'%';
+  document.getElementById('sBest').textContent=filtered.length?filtered[0]._sc+'/100':'—';
+  document.getElementById('sOff').textContent=filtered.filter(d=>d.s==='off-plan').length;
+  const devs=new Set(filtered.map(d=>d.d));
+  document.getElementById('sDev').textContent=devs.size;
+  const allDevs=new Set(D.map(d=>d.d));
+  document.getElementById('devCountTag').textContent=allDevs.size;
+}
+document.querySelectorAll('thead th[data-s]').forEach(th=>{th.onclick=()=>{const k=th.dataset.s;if(sort.k===k)sort.d=sort.d==='desc'?'asc':'desc';else sort={k,d:k==='developer'||k==='project'?'asc':'desc'};doSort();render();};});
+
+// IMAGE SYSTEM — premium SVG illustrations (no network needed)
+function makeSVG(type,seed,w,h,label){
+  const s=Math.abs(seed);
+  const r=(n,m)=>(s*n+7)%m; // seeded pseudo-random
+  let defs='',shapes='';
+  // Unique gradient ID per image to avoid conflicts
+  const gid='g'+s;
+  // Sky palettes — warm Mediterranean tones
+  const palettes=[
+    {sky1:'#1b2838',sky2:'#0f1923',ground:'#1a1a2e',accent:'#c9a34f'},
+    {sky1:'#1e3044',sky2:'#0d1b2a',ground:'#16213e',accent:'#e2c477'},
+    {sky1:'#2d1b38',sky2:'#1a0f23',ground:'#1a1a2e',accent:'#d4a853'},
+    {sky1:'#1b3038',sky2:'#0f1d23',ground:'#1a2e1a',accent:'#b8963e'},
+    {sky1:'#382d1b',sky2:'#231e0f',ground:'#2e2a1a',accent:'#e2c477'},
+    {sky1:'#1b2030',sky2:'#0d1520',ground:'#181828',accent:'#c9a34f'},
+    {sky1:'#30281b',sky2:'#201d0f',ground:'#28241a',accent:'#d4a853'},
+    {sky1:'#1b3030',sky2:'#0f2020',ground:'#1a2828',accent:'#b8963e'}
+  ];
+  const pal=palettes[s%palettes.length];
+
+  defs+=`<linearGradient id="${gid}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${pal.sky1}"/><stop offset="100%" stop-color="${pal.sky2}"/></linearGradient>`;
+  defs+=`<linearGradient id="${gid}w" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="rgba(201,163,79,0)" /><stop offset="50%" stop-color="rgba(201,163,79,0.03)"/><stop offset="100%" stop-color="rgba(201,163,79,0)"/></linearGradient>`;
+
+  // Background
+  shapes+=`<rect width="${w}" height="${h}" fill="url(#${gid}s)"/>`;
+
+  // Stars
+  for(let i=0;i<12;i++){
+    const sx=r(i*37+13,w);const sy=r(i*23+7,h*0.4);
+    shapes+=`<circle cx="${sx}" cy="${sy}" r="${0.5+r(i*3,2)*0.5}" fill="rgba(255,255,255,${0.2+r(i*11,4)*0.1})" />`;
+  }
+
+  // Moon/sun glow
+  const moonX=w-70-r(17,60);const moonY=35+r(13,25);
+  shapes+=`<circle cx="${moonX}" cy="${moonY}" r="35" fill="rgba(201,163,79,0.05)"/>`;
+  shapes+=`<circle cx="${moonX}" cy="${moonY}" r="20" fill="rgba(201,163,79,0.08)"/>`;
+  shapes+=`<circle cx="${moonX}" cy="${moonY}" r="12" fill="rgba(226,196,119,0.15)"/>`;
+
+  // Distant mountains/horizon
+  const mh=h-70;
+  shapes+=`<path d="M0,${mh} Q${w*0.15},${mh-30-r(7,20)} ${w*0.3},${mh-10} T${w*0.5},${mh-25-r(11,15)} T${w*0.75},${mh-5} T${w},${mh-20-r(3,15)} L${w},${h} L0,${h} Z" fill="rgba(255,255,255,0.02)"/>`;
+
+  // Ground plane with gradient
+  const gy=h-55-r(5,10);
+  defs+=`<linearGradient id="${gid}gnd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${pal.ground}"/><stop offset="100%" stop-color="${pal.sky2}"/></linearGradient>`;
+  shapes+=`<rect x="0" y="${gy}" width="${w}" height="${h-gy}" fill="url(#${gid}gnd)"/>`;
+  shapes+=`<line x1="0" y1="${gy}" x2="${w}" y2="${gy}" stroke="rgba(201,163,79,0.1)" stroke-width="1"/>`;
+
+  if(type==='Villa'){
+    // Modern villa — clean architectural style
+    const vx=160+r(23,100);const vy=gy;const vw=200+r(13,40);const vh=80+r(9,25);
+    // Main body
+    shapes+=`<rect x="${vx}" y="${vy-vh}" width="${vw}" height="${vh}" rx="3" fill="rgba(255,255,255,0.08)" stroke="rgba(201,163,79,0.2)" stroke-width="1"/>`;
+    // Flat modern roof with slight overhang
+    shapes+=`<rect x="${vx-8}" y="${vy-vh-6}" width="${vw+16}" height="6" rx="1" fill="rgba(201,163,79,0.15)"/>`;
+    // Second floor / extension
+    const ex=vx+vw*0.6;const ew=vw*0.5;const eh=40+r(7,15);
+    shapes+=`<rect x="${ex}" y="${vy-vh-eh}" width="${ew}" height="${eh}" rx="2" fill="rgba(255,255,255,0.06)" stroke="rgba(201,163,79,0.15)" stroke-width="1"/>`;
+    shapes+=`<rect x="${ex-5}" y="${vy-vh-eh-4}" width="${ew+10}" height="4" rx="1" fill="rgba(201,163,79,0.12)"/>`;
+    // Large windows with warm glow
+    for(let i=0;i<4;i++){
+      const wx=vx+18+i*(vw-36)/4;const ww=(vw-36)/4-8;
+      shapes+=`<rect x="${wx}" y="${vy-vh+15}" width="${ww}" height="${vh-30}" rx="2" fill="rgba(201,163,79,${0.08+r(i*3,5)*0.02})" stroke="rgba(201,163,79,0.15)" stroke-width="0.5"/>`;
+      // Interior glow
+      shapes+=`<rect x="${wx+2}" y="${vy-vh+17}" width="${ww-4}" height="${vh-34}" rx="1" fill="rgba(226,196,119,${0.03+r(i*7,4)*0.01})"/>`;
+    }
+    // Upper floor windows
+    for(let i=0;i<2;i++){
+      const wx=ex+12+i*((ew-24)/2);
+      shapes+=`<rect x="${wx}" y="${vy-vh-eh+10}" width="${(ew-24)/2-6}" height="${eh-18}" rx="2" fill="rgba(201,163,79,0.1)" stroke="rgba(201,163,79,0.12)" stroke-width="0.5"/>`;
+    }
+    // Pool
+    const px=vx-80-r(5,30);const py=vy-10;const pw=65;const ph2=25;
+    defs+=`<linearGradient id="${gid}pool" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(56,189,248,0.25)"/><stop offset="100%" stop-color="rgba(14,165,233,0.15)"/></linearGradient>`;
+    shapes+=`<rect x="${px}" y="${py}" width="${pw}" height="${ph2}" rx="4" fill="url(#${gid}pool)" stroke="rgba(56,189,248,0.2)" stroke-width="0.5"/>`;
+    // Pool shimmer
+    shapes+=`<line x1="${px+10}" y1="${py+8}" x2="${px+25}" y2="${py+8}" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>`;
+    shapes+=`<line x1="${px+30}" y1="${py+15}" x2="${px+50}" y2="${py+15}" stroke="rgba(255,255,255,0.08)" stroke-width="0.5"/>`;
+    // Palm tree
+    const ptx=vx-30-r(11,40);const pty=vy;
+    shapes+=`<path d="M${ptx},${pty} Q${ptx+3},${pty-50} ${ptx-2},${pty-90}" stroke="rgba(139,119,79,0.4)" stroke-width="3" fill="none"/>`;
+    for(let l=0;l<5;l++){
+      const la=-60+l*30;const lr=25+r(l*3,10);
+      shapes+=`<path d="M${ptx-2},${pty-88} Q${ptx-2+Math.cos(la*Math.PI/180)*lr*0.5},${pty-88+Math.sin(la*Math.PI/180)*lr*0.3} ${ptx-2+Math.cos(la*Math.PI/180)*lr},${pty-88+Math.sin(la*Math.PI/180)*lr}" stroke="rgba(34,120,69,0.3)" stroke-width="2" fill="none"/>`;
+    }
+  }else if(type==='Apartment'){
+    // Modern apartment complex
+    const bx=120+r(19,80);
+    // Main tower
+    const bw=90+r(7,30);const bh=130+r(11,40);
+    shapes+=`<rect x="${bx}" y="${gy-bh}" width="${bw}" height="${bh}" rx="2" fill="rgba(255,255,255,0.07)" stroke="rgba(201,163,79,0.15)" stroke-width="1"/>`;
+    // Balcony lines
+    for(let f=0;f<Math.floor(bh/22);f++){
+      const fy=gy-bh+12+f*22;
+      shapes+=`<line x1="${bx}" y1="${fy}" x2="${bx+bw}" y2="${fy}" stroke="rgba(201,163,79,0.08)" stroke-width="0.5"/>`;
+      // Windows per floor
+      for(let wi=0;wi<3;wi++){
+        const wx=bx+8+wi*(bw-16)/3;const ww=(bw-16)/3-4;
+        const lit=r(f*3+wi*7+s,5)>1;
+        shapes+=`<rect x="${wx}" y="${fy+3}" width="${ww}" height="14" rx="1" fill="rgba(${lit?'226,196,119':'100,100,120'},${lit?0.08+r(f+wi,4)*0.02:0.03})" stroke="rgba(201,163,79,${lit?0.1:0.05})" stroke-width="0.3"/>`;
+      }
+    }
+    // Second building
+    const b2x=bx+bw+15+r(3,25);const b2w=70+r(13,25);const b2h=90+r(17,35);
+    shapes+=`<rect x="${b2x}" y="${gy-b2h}" width="${b2w}" height="${b2h}" rx="2" fill="rgba(255,255,255,0.05)" stroke="rgba(201,163,79,0.12)" stroke-width="1"/>`;
+    for(let f=0;f<Math.floor(b2h/22);f++){
+      const fy=gy-b2h+12+f*22;
+      shapes+=`<line x1="${b2x}" y1="${fy}" x2="${b2x+b2w}" y2="${fy}" stroke="rgba(201,163,79,0.06)" stroke-width="0.5"/>`;
+      for(let wi=0;wi<2;wi++){
+        const wx=b2x+8+wi*(b2w-16)/2;const ww=(b2w-16)/2-4;
+        const lit=r(f*5+wi*11+s,4)>1;
+        shapes+=`<rect x="${wx}" y="${fy+3}" width="${ww}" height="14" rx="1" fill="rgba(${lit?'226,196,119':'100,100,120'},${lit?0.07:0.02})" stroke="rgba(201,163,79,${lit?0.08:0.04})" stroke-width="0.3"/>`;
+      }
+    }
+    // Third building (background)
+    const b3x=b2x+b2w+10+r(7,20);const b3w=55+r(9,20);const b3h=60+r(23,30);
+    shapes+=`<rect x="${b3x}" y="${gy-b3h}" width="${b3w}" height="${b3h}" rx="2" fill="rgba(255,255,255,0.03)" stroke="rgba(201,163,79,0.08)" stroke-width="0.5"/>`;
+    // Communal pool
+    const px=bx+bw/2-30;
+    shapes+=`<rect x="${px}" y="${gy+5}" width="60" height="18" rx="8" fill="rgba(56,189,248,0.15)" stroke="rgba(56,189,248,0.1)" stroke-width="0.5"/>`;
+  }else{
+    // Townhouses — Mediterranean row
+    for(let ti=0;ti<5;ti++){
+      const tx=60+ti*100+r(ti*3,15);const tw=85;const th2=65+r(ti*7,25);
+      // Wall
+      shapes+=`<rect x="${tx}" y="${gy-th2}" width="${tw}" height="${th2}" rx="1" fill="rgba(255,255,255,${0.04+ti*0.01})" stroke="rgba(201,163,79,${0.1+ti*0.02})" stroke-width="0.8"/>`;
+      // Pitched roof
+      shapes+=`<polygon points="${tx-3},${gy-th2} ${tx+tw/2},${gy-th2-18-r(ti*5,10)} ${tx+tw+3},${gy-th2}" fill="rgba(180,100,50,${0.12+ti*0.02})" stroke="rgba(201,163,79,0.1)" stroke-width="0.5"/>`;
+      // Windows
+      shapes+=`<rect x="${tx+10}" y="${gy-th2+14}" width="22" height="18" rx="1" fill="rgba(201,163,79,${0.06+r(ti*3,4)*0.02})" stroke="rgba(201,163,79,0.1)" stroke-width="0.3"/>`;
+      shapes+=`<rect x="${tx+tw-32}" y="${gy-th2+14}" width="22" height="18" rx="1" fill="rgba(201,163,79,${0.06+r(ti*7,4)*0.02})" stroke="rgba(201,163,79,0.1)" stroke-width="0.3"/>`;
+      // Door
+      shapes+=`<rect x="${tx+tw/2-8}" y="${gy-28}" width="16" height="28" rx="1" fill="rgba(139,119,79,0.15)" stroke="rgba(201,163,79,0.12)" stroke-width="0.5"/>`;
+      // Balcony on some
+      if(ti%2===0){
+        shapes+=`<rect x="${tx+15}" y="${gy-th2+36}" width="tw-30" height="2" fill="rgba(201,163,79,0.1)"/>`;
+      }
+    }
+  }
+
+  // Type label + developer overlay
+  const lbl=label||type;
+  shapes+=`<rect x="0" y="${h-32}" width="${w}" height="32" fill="rgba(0,0,0,0.4)"/>`;
+  shapes+=`<text x="16" y="${h-12}" font-family="Inter,system-ui,sans-serif" font-size="11" font-weight="600" fill="rgba(201,163,79,0.7)" letter-spacing="1">${type.toUpperCase()}</text>`;
+  if(lbl!==type){shapes+=`<text x="${w-16}" y="${h-12}" text-anchor="end" font-family="Inter,system-ui,sans-serif" font-size="10" fill="rgba(255,255,255,0.35)">${lbl.length>45?lbl.slice(0,42)+'...':lbl}</text>`;}
+
+  // Gold accent line at bottom
+  shapes+=`<rect x="0" y="${h-2}" width="${w}" height="2" fill="rgba(201,163,79,0.3)"/>`;
+
+  return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`+
+    `<defs>${defs}</defs>`+shapes+`</svg>`
+  );
+}
+// Real photo IDs from picsum.photos (architecture/landscape themed)
+const photoPool={
+  Villa:[1029,164,1068,206,280,1048,1076,1060,1080,1040,1054,1036],
+  Apartment:[260,261,268,271,279,290,282,259,49,299,338,366],
+  Townhouse:[323,356,368,339,416,217,292,365,336,348,380,394]
+};
+function getImgs(d){
+  const idx=D.indexOf(d);
+  const pool=photoPool[d.t]||photoPool.Apartment;
+  const shuffled=[...pool];
+  for(let i=shuffled.length-1;i>0;i--){const j=(idx*7+i*3)%shuffled.length;[shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];}
+  return shuffled.slice(0,8).map(id=>`https://picsum.photos/id/${id}/600/300`);
+}
+function getSvgFallback(d,i){
+  const idx=D.indexOf(d);
+  return makeSVG(d.t,idx*8+i,600,300,d.d+' — '+d.l);
+}
+
+// GALLERY STATE
+let galImgs=[],galIdx=0,galDeal=null;
+function galShow(i){
+  galIdx=i;
+  const container=document.getElementById('prevImg');
+  let img=container.querySelector('img');
+  if(!img){
+    img=document.createElement('img');
+    img.style.cssText='width:100%;height:100%;object-fit:cover;';
+    container.insertBefore(img,container.firstChild);
+  }
+  // Set onerror BEFORE src — falls back to SVG illustration if blocked
+  const fi=i;
+  img.onerror=function(){this.onerror=null;if(galDeal)this.src=getSvgFallback(galDeal,fi);};
+  img.src=galImgs[i];
+  document.getElementById('prevCounter').textContent=(i+1)+'/'+galImgs.length;
+  document.querySelectorAll('.prev-thumb').forEach((th,ti)=>{th.classList.toggle('active',ti===i);});
+}
+function galNav(dir){
+  galIdx=(galIdx+dir+galImgs.length)%galImgs.length;
+  galShow(galIdx);
+}
+
+// PREVIEW
+function openPreview(idx){
+  const d=D[idx],dc=disc(d),panel=document.getElementById('preview');
+  galDeal=d;galImgs=getImgs(d);galIdx=0;
+  // Main image
+  const imgArea=document.getElementById('prevImg');
+  const oldImgs=imgArea.querySelectorAll('img');oldImgs.forEach(e=>e.remove());
+  const mainImg=document.createElement('img');
+  mainImg.alt=d.p;
+  mainImg.style.cssText='width:100%;height:100%;object-fit:cover;';
+  // onerror BEFORE src — SVG fallback if external images blocked
+  mainImg.onerror=function(){this.onerror=null;this.src=getSvgFallback(d,0);};
+  mainImg.src=galImgs[0];
+  imgArea.insertBefore(mainImg,imgArea.firstChild);
+  // Badge
+  let badge=imgArea.querySelector('.prev-badge');
+  if(!badge){badge=document.createElement('span');badge.className='prev-badge';imgArea.appendChild(badge);}
+  badge.className='prev-badge '+(d.s==='off-plan'?'dt op':d.s==='under-construction'?'dt warm':'dt cool');
+  badge.textContent=d.s==='off-plan'?'Off-Plan':d.s==='under-construction'?'Under Construction':'Ready';
+  document.getElementById('prevCounter').textContent='1/'+galImgs.length;
+  // Thumbnails
+  const thumbs=document.getElementById('prevThumbs');thumbs.innerHTML='';
+  galImgs.forEach((src,i)=>{
+    const th=document.createElement('div');th.className='prev-thumb'+(i===0?' active':'');
+    const tImg=document.createElement('img');
+    tImg.style.cssText='width:100%;height:100%;object-fit:cover;';
+    const ti2=i;
+    tImg.onerror=function(){this.onerror=null;this.src=getSvgFallback(d,ti2);};
+    tImg.src=src;
+    th.appendChild(tImg);
+    th.onclick=()=>galShow(i);thumbs.appendChild(th);
+  });
+  document.getElementById('prevTitle').textContent=d.p;
+  document.getElementById('prevLoc').textContent=d.l+' — '+rLbl(d.r);
+  const sb=document.getElementById('prevScoreBig');sb.textContent=d._sc;sb.style.color=scColor(d._sc);
+  const bar=document.getElementById('prevScoreBar');bar.style.width=d._sc+'%';bar.style.background=scColor(d._sc);
+  document.getElementById('prevSaving').innerHTML=dTag(dc);
+  // Price vs Market comparison
+  const diffPct=((d.pm2-d.mm2)/d.mm2*100);
+  const isBelow=diffPct<0;
+  const absDiff=Math.abs(diffPct).toFixed(1);
+  const diffColor=isBelow?'var(--green)':'var(--red)';
+  const diffLabel=isBelow?absDiff+'% below market':diffPct===0?'At market price':absDiff+'% above market';
+  const diffIcon=isBelow?'▼':'▲';
+  const savedPerM2=d.mm2-d.pm2;
+  const savedTotal=savedPerM2*(d.bm||80);
+  document.getElementById('prevGrid').innerHTML=`
+    <div class="prev-stat" style="grid-column:1/3;background:linear-gradient(135deg,${isBelow?'rgba(16,185,129,0.08)':'rgba(239,68,68,0.08)'},var(--card2));border-color:${isBelow?'rgba(16,185,129,0.3)':'rgba(239,68,68,0.2)'}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div><div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:2px">Your Price</div><div style="font-size:22px;font-weight:700;color:var(--text);font-family:'Playfair Display',serif">€${d.pm2.toLocaleString()}/m²</div></div>
+        <div style="font-size:28px;font-weight:800;color:${diffColor};font-family:'Playfair Display',serif">${diffIcon} ${absDiff}%</div>
+        <div style="text-align:right"><div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:2px">Market Price</div><div style="font-size:22px;font-weight:700;color:var(--muted);font-family:'Playfair Display',serif">€${d.mm2.toLocaleString()}/m²</div></div>
+      </div>
+      <div style="height:6px;background:#1e1e28;border-radius:3px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:${Math.min(100,d.pm2/d.mm2*100)}%;background:${diffColor};border-radius:3px"></div></div>
+      <div style="font-size:11px;color:${diffColor};font-weight:600;text-align:center">${diffLabel}${isBelow?' — est. saving €'+Math.abs(savedTotal).toLocaleString()+' on this property':''}</div>
+    </div>
+    <div class="prev-stat"><div class="prev-stat-val">${fP(d.pf)}</div><div class="prev-stat-lbl">From Price</div></div>
+    <div class="prev-stat"><div class="prev-stat-val">${d.pt?fP(d.pt):'—'}</div><div class="prev-stat-lbl">To Price</div></div>
+    <div class="prev-stat"><div class="prev-stat-val">${d.bm?d.bm+'m²':'—'}</div><div class="prev-stat-lbl">Built Area</div></div>
+    <div class="prev-stat"><div class="prev-stat-val">${d.pl?d.pl+'m²':'—'}</div><div class="prev-stat-lbl">Plot Size</div></div>
+    <div class="prev-stat"><div class="prev-stat-val">${d.bd} bed / ${d.ba} bath</div><div class="prev-stat-lbl">Bedrooms</div></div>
+    <div class="prev-stat"><div class="prev-stat-val">${d.bk!==null?d.bk+' km':'—'}</div><div class="prev-stat-lbl">Beach Distance</div></div>
+    <div class="prev-stat"><div class="prev-stat-val">${d.c}</div><div class="prev-stat-lbl">Est. Completion</div></div>
+    <div class="prev-stat"><div class="prev-stat-val">${d.s==='off-plan'?'Off-Plan':d.s==='under-construction'?'Building':'Ready'}</div><div class="prev-stat-lbl">Status</div></div>`;
+  document.getElementById('prevTags').innerHTML=`<span class="prev-tag">${d.t}</span><span class="prev-tag">${rLbl(d.r)}</span><span class="prev-tag">${d.s}</span><span class="prev-tag">${d.dy}+ yrs developer</span>${d.pt?`<span class="prev-tag">Up to ${fP(d.pt)}</span>`:''}`;
+  document.getElementById('prevDesc').textContent=d.f;
+  document.getElementById('prevDev').textContent=d.d+' — '+d.dy+'+ years in the Spanish property market.';
+  const link=document.getElementById('prevLink');
+  if(d.u){link.href=d.u;link.style.display='block';}else{link.style.display='none';}
+  panel.classList.add('open');
+  document.querySelectorAll('tbody tr').forEach(tr=>tr.classList.remove('selected'));
+  const sel=document.querySelector(`tbody tr[data-idx="${idx}"]`);if(sel)sel.classList.add('selected');
+}
+function closePreview(){document.getElementById('preview').classList.remove('open');document.querySelectorAll('tbody tr').forEach(tr=>tr.classList.remove('selected'));}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closePreview();
+  if(e.key==='ArrowLeft'&&document.getElementById('preview').classList.contains('open'))galNav(-1);
+  if(e.key==='ArrowRight'&&document.getElementById('preview').classList.contains('open'))galNav(1);
+});
+
+// TABS
+function stab(t){document.querySelectorAll('.tab').forEach(tb=>tb.classList.remove('active'));document.querySelector(`.tab[data-t="${t}"]`).classList.add('active');['deals','market','about'].forEach(x=>document.getElementById('t-'+x).classList.toggle('hidden',x!==t));if(t==='market')renderCharts();}
+
+// CHARTS
+function renderCharts(){
+  renderBar('cA',mkt.apt,'v','€',5000,'m');renderBar('cV',mkt.vil,'v','€',5000,'m');renderBar('cG',mkt.grw,'v','%',25,'d');
+  const as={};D.forEach(d=>{const a=d.l.split(',')[0].trim();if(!as[a]||d._sc>as[a])as[a]=d._sc;});
+  const sd=Object.entries(as).map(([a,s])=>({a,v:s})).sort((a,b)=>b.v-a.v).slice(0,12);renderBar('cS',sd,'v','',100,'d');
+}
+function renderBar(id,data,vk,sfx,mx,cc){
+  const c=document.getElementById(id);c.innerHTML='';
+  data.forEach(it=>{const v=it[vk]||it.v,p=(v/mx*100).toFixed(1);const r=document.createElement('div');r.className='bar-row';r.innerHTML=`<span class="bar-lbl">${it.a}</span><div class="bar-trk"><div class="bar-fl ${cc}" style="width:${p}%">${sfx==='€'?'€':''}${v.toLocaleString()}${sfx==='%'?'%':''}</div></div>`;c.appendChild(r);});
+}
+
+// INIT
+D.forEach(d=>{d._sc=calcScore(d);});filtered=[...D];doSort();render();stats();
+document.getElementById('fQ').addEventListener('keyup',e=>{if(e.key==='Enter')go();});
+</script>
+</body>
+</html>
