@@ -814,7 +814,7 @@ function renderYield(){
       <div id="ycalc-${i}" style="display:none;padding:0 20px 20px;border-top:1px solid var(--border)">
         <div style="padding-top:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
           <div style="font-size:12px;font-weight:700;color:var(--gold)">Investment Calculator</div>
-          <div style="font-size:10px;color:var(--muted)">3.75% interest • 25yr term</div>
+          <div style="font-size:10px;color:var(--muted)">3.5% interest • 25yr term</div>
         </div>
         <div style="margin-bottom:8px"><span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Down Payment: </span><span id="ydown-${i}" style="font-size:14px;font-weight:700;color:var(--gold)">30%</span></div>
         <input type="range" id="yslider-${i}" min="10" max="100" value="30" style="width:100%;accent-color:var(--gold);margin-bottom:16px" oninput="updateCalc(${i},this.value,${avgP})">
@@ -828,7 +828,7 @@ function renderYield(){
 }
 function calcGrid(i,pct,avgP,netIncome){
   const totalCost=Math.round(avgP*1.12);const down=Math.round(totalCost*pct/100);const loan=totalCost-down;
-  const r=0.0375/12;const n=25*12;const monthly=loan>0?Math.round(loan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)):0;
+  const r=0.035/12;const n=25*12;const monthly=loan>0?Math.round(loan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)):0;
   const annualMort=monthly*12;const cashFlow=netIncome-annualMort;const cashYield=down>0?+(cashFlow/down*100).toFixed(1):0;
   const col=cashFlow>=0?'#10b981':'#ef4444';
   return`<div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Down Payment</div><div style="font-size:16px;font-weight:700;color:var(--gold)">€${down.toLocaleString()}</div></div>
