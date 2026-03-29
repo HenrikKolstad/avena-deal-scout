@@ -443,13 +443,15 @@ function calcYield(d){
   const beds=d.bd||2;const isV=d.t==='Villa'||d.t==='Townhouse';
   const bedMult=beds<=1?0.7:beds===2?1:beds===3?1.3:1.5;
   const typeMult=isV?1.2:1;
+  const avgP2=(d.pf+(d.pt||d.pf))/2;
+  const luxMult=avgP2>=800000?2.2:avgP2>=500000?1.7:avgP2>=350000?1.3:1;
   // Find matching area
   let match=null;
   for(const r of rentalData){if(d.l.includes(r.k)||d.p.includes(r.k)){match=r;break;}}
   if(!match){for(const r of rentalData){if(r.k.includes(d.l.split(',')[0].trim())){match=r;break;}}}
   const baseAdr=match?match.adr:(d.r==='cb-north'?80:d.r==='cb-south'?70:50);
   const baseWk=match?match.wk:(d.r==='cb-north'?20:d.r==='cb-south'?19:16);
-  const rate=Math.round(baseAdr*bedMult*typeMult);
+  const rate=Math.round(baseAdr*bedMult*typeMult*luxMult);
   const weeks=baseWk;
   const avgP=(d.pf+(d.pt||d.pf))/2;const annual=rate*weeks*7;
   const src=match?match.src:'Estimated';
