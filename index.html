@@ -167,7 +167,7 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
   </div>
   <div class="stats-row">
     <div class="stat"><div class="stat-val" id="sTotal">0</div><div class="stat-lbl">Properties</div></div>
-    <div class="stat"><div class="stat-val" id="sAvg">0%</div><div class="stat-lbl">Avg Saving</div></div>
+    <div class="stat"><div class="stat-val" id="sAvg">0%</div><div class="stat-lbl">vs Market</div></div>
     <div class="stat"><div class="stat-val" id="sBest">—</div><div class="stat-lbl">Best Score</div></div>
     <div class="stat"><div class="stat-val" id="sOff">0</div><div class="stat-lbl">Off-Plan</div></div>
     <div class="stat"><div class="stat-val" id="sDev">0</div><div class="stat-lbl">Developers</div></div>
@@ -186,6 +186,7 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
 
 <div class="tabs">
   <div class="tab active" data-t="deals" onclick="stab('deals')">Deal Rankings</div>
+  <div class="tab" data-t="yield" onclick="stab('yield')" style="color:var(--gold)">💰 Rental Yield</div>
   <div class="tab" data-t="market" onclick="stab('market')">Market Overview</div>
   <div class="tab" data-t="about" onclick="stab('about')">Scoring Method</div>
 </div>
@@ -203,7 +204,7 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
         <th data-s="price">Price</th>
         <th data-s="priceM2">€/m²</th>
         <th data-s="marketM2">Market</th>
-        <th data-s="discount">Saving</th>
+        <th data-s="discount">vs Market</th>
         <th data-s="built">Built</th>
         <th data-s="plot">Plot</th>
         <th data-s="beds">Bed</th>
@@ -213,6 +214,24 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
       </tr></thead>
       <tbody id="tb"></tbody>
     </table>
+  </div>
+</div>
+
+<div id="t-yield" class="hidden">
+  <div style="padding:24px 32px;max-width:1400px;margin:0 auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);margin-bottom:4px">Estimated Rental Yield</h2>
+        <p style="color:var(--muted);font-size:12px">Based on Airbnb market data • 18-22 weeks occupancy • Gross yield before expenses</p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <span style="font-size:10px;color:var(--muted)">SORT:</span>
+        <button class="btn" onclick="yieldSort('yield')" style="font-size:10px;padding:5px 12px">By Yield %</button>
+        <button class="btn" onclick="yieldSort('income')" style="font-size:10px;padding:5px 12px">By Income €</button>
+        <button class="btn" onclick="yieldSort('price')" style="font-size:10px;padding:5px 12px">By Price</button>
+      </div>
+    </div>
+    <div id="yieldGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px"></div>
   </div>
 </div>
 
@@ -363,7 +382,7 @@ grw:[{a:"Los Alcázares",v:22},{a:"Benidorm",v:16},{a:"San Javier",v:16},{a:"Gra
 // SCORING
 function calcScore(d){
   let s=0;
-  if(d.mm2>0&&d.pm2>0){const df=(d.mm2-d.pm2)/d.mm2;if(df>=.25)s+=40;else if(df>=.20)s+=36;else if(df>=.15)s+=32;else if(df>=.10)s+=26;else if(df>=.05)s+=20;else if(df>=0)s+=12;else s+=Math.max(0,12+df*40);}
+  if(d.mm2>0&&d.pm2>0){const df=(d.mm2-d.pm2)/d.mm2;if(df>=.25)s+=40;else if(df>=.20)s+=36;else if(df>=.15)s+=32;else if(df>=.10)s+=26;else if(df>=.05)s+=20;else if(df>=0)s+=12;else if(df>=-0.1)s+=5;else if(df>=-0.15)s+=0;else if(df>=-0.25)s-=5;else s-=10;}
   if(d.s==='off-plan'){s+=14;if(d.c&&d.c.includes('2027'))s+=4;if(d.c&&d.c.includes('2028'))s+=6;}else if(d.s==='under-construction')s+=8;else s+=2;
   if(d.pl&&d.pl>0){const pp=d.pf/d.pl;if(pp<600)s+=15;else if(pp<800)s+=12;else if(pp<1000)s+=9;else if(pp<1500)s+=6;else s+=3;}else if(d.bm&&d.pf){const rt=d.bm/(d.pf/100000);if(rt>50)s+=13;else if(rt>40)s+=10;else if(rt>30)s+=7;else s+=4;}
   if(d.bk!==null){if(d.bk<=.5)s+=15;else if(d.bk<=2)s+=12;else if(d.bk<=5)s+=9;else if(d.bk<=10)s+=6;else s+=3;}
@@ -378,11 +397,21 @@ function rLbl(r){return r==='cb-south'?'CB South':r==='cb-north'?'CB North':'C. 
 function rCls(r){return r==='cb-south'?'rt-s':r==='cb-north'?'rt-n':'rt-c';}
 function tCls(t){return t==='Villa'?'tt-v':t==='Townhouse'?'tt-t':'tt-a';}
 function stTag(s){return s==='off-plan'?'<span class="dt op">Off-Plan</span>':s==='under-construction'?'<span class="dt warm">Building</span>':'<span class="dt cool">Ready</span>';}
-function dTag(p){return p>=20?`<span class="dt hot">-${p.toFixed(0)}%</span>`:p>=10?`<span class="dt warm">-${p.toFixed(0)}%</span>`:p>=0?`<span class="dt cool">-${p.toFixed(0)}%</span>`:`<span class="dt" style="background:rgba(239,68,68,0.1);color:#ef4444">+${Math.abs(p).toFixed(0)}%</span>`;}
+function dTag(p){return p>=20?`<span class="dt hot">-${p.toFixed(0)}%</span>`:p>=10?`<span class="dt warm">-${p.toFixed(0)}%</span>`:p>=0?`<span class="dt cool">-${p.toFixed(0)}%</span>`:`<span class="dt" style="background:rgba(239,68,68,0.15);color:#ef4444;font-weight:800">⚠ +${Math.abs(p).toFixed(0)}%</span>`;}
 function fP(n){return'€'+n.toLocaleString('en');}
 function scColor(s){return s>=80?'#10b981':s>=70?'#34d399':s>=60?'var(--gold)':s>=50?'#f97316':'var(--muted)';}
 function monthsToCompletion(c){if(!c)return 0;let y,m;if(c.includes('Q')){const parts=c.split('-Q');y=parseInt(parts[0]);m=parseInt(parts[1])*3;}else{const parts=c.split('-');y=parseInt(parts[0]);m=parseInt(parts[1])||6;}const target=new Date(y,m-1);const now=new Date();return Math.max(0,Math.round((target-now)/(1000*60*60*24*30)));}
 function getGrowthRate(d){for(const g of mkt.grw){if(d.l.includes(g.a)||g.a.includes(d.l.split(',')[0].trim()))return g.v;}if(d.r==='cb-south')return 10;if(d.r==='cb-north')return 8;return 7;}
+function calcYield(d){
+  const bk=d.bk!==null?d.bk:20;const isV=d.t==='Villa'||d.t==='Townhouse';const isN=d.r==='cb-north';
+  let rate,weeks;
+  if(isV){if(bk<=2){rate=isN?160:130;weeks=20;}else if(bk<=5){rate=isN?120:100;weeks=19;}else{rate=isN?100:80;weeks=18;}}
+  else{if(bk<=1){rate=isN?90:75;weeks=22;}else if(bk<=5){rate=isN?70:60;weeks=20;}else{rate=isN?50:45;weeks=18;}}
+  const avgP=(d.pf+(d.pt||d.pf))/2;const annual=rate*weeks*7;
+  return{gross:+(annual/avgP*100).toFixed(1),annual:Math.round(annual),rate:Math.round(rate)};
+}
+function yldCls(y){return y>=7?'color:#10b981':y>=5?'color:var(--gold)':y>=3?'color:var(--muted)':'color:#ef4444';}
+function yldTag(y){return`<span style="${yldCls(y)};font-weight:700">${y}%</span>`;}
 
 function go(){
   const r=document.getElementById('fR').value,t=document.getElementById('fT').value,mp=parseInt(document.getElementById('fP').value)||1e6,ms=parseInt(document.getElementById('fS').value)||0,st=document.getElementById('fO').value,q=document.getElementById('fQ').value.toLowerCase();
@@ -410,8 +439,8 @@ function render(){
 }
 function stats(){
   document.getElementById('sTotal').textContent=filtered.length;
-  const avg=filtered.length?filtered.reduce((s,d)=>s+Math.max(0,disc(d)),0)/filtered.length:0;
-  document.getElementById('sAvg').textContent=avg.toFixed(0)+'%';
+  const avg=filtered.length?filtered.reduce((s,d)=>s+disc(d),0)/filtered.length:0;
+  const avgEl=document.getElementById('sAvg');avgEl.textContent=(avg>=0?'-':'+')+Math.abs(avg).toFixed(0)+'%';avgEl.style.color=avg>=0?'var(--gold)':'#ef4444';
   document.getElementById('sBest').textContent=filtered.length?filtered[0]._sc+'/100':'—';
   document.getElementById('sOff').textContent=filtered.filter(d=>d.s==='off-plan').length;
   const devs=new Set(filtered.map(d=>d.d));
@@ -699,7 +728,73 @@ document.addEventListener('keydown',e=>{
 });
 
 // TABS
-function stab(t){document.querySelectorAll('.tab').forEach(tb=>tb.classList.remove('active'));document.querySelector(`.tab[data-t="${t}"]`).classList.add('active');['deals','market','about'].forEach(x=>document.getElementById('t-'+x).classList.toggle('hidden',x!==t));if(t==='market')renderCharts();}
+function stab(t){document.querySelectorAll('.tab').forEach(tb=>tb.classList.remove('active'));document.querySelector(`.tab[data-t="${t}"]`).classList.add('active');['deals','yield','market','about'].forEach(x=>document.getElementById('t-'+x).classList.toggle('hidden',x!==t));if(t==='market')renderCharts();if(t==='yield')renderYield();}
+
+// RENTAL YIELD TAB
+let yieldSortKey='yield';
+function yieldSort(k){yieldSortKey=k;renderYield();}
+function renderYield(){
+  const grid=document.getElementById('yieldGrid');grid.innerHTML='';
+  const list=[...filtered].map(d=>{const y=calcYield(d);return{...d,_y:y};});
+  list.sort((a,b)=>{
+    if(yieldSortKey==='yield')return b._y.gross-a._y.gross;
+    if(yieldSortKey==='income')return b._y.annual-a._y.annual;
+    return a.pf-b.pf;
+  });
+  list.forEach((d,i)=>{
+    const y=d._y;const avgP=Math.round((d.pf+(d.pt||d.pf))/2);
+    const netIncome=Math.round(y.annual*0.65);
+    const netYield=+(netIncome/avgP*100).toFixed(1);
+    const yCol=y.gross>=7?'#10b981':y.gross>=5?'var(--gold)':y.gross>=3?'var(--muted)':'#ef4444';
+    const card=document.createElement('div');
+    card.style.cssText='background:var(--card2);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s;';
+    card.onmouseenter=function(){this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)';};
+    card.onmouseleave=function(){this.style.borderColor='var(--border)';this.style.transform='none';};
+    card.innerHTML=`
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-weight:700;color:var(--gold-light);font-size:14px">${d.p}</div><div style="color:var(--muted);font-size:11px;margin-top:2px">${d.d} — ${d.l}</div></div>
+        <div style="text-align:right"><div style="font-size:28px;font-weight:800;color:${yCol};font-family:'Playfair Display',serif">${y.gross}%</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Gross Yield</div></div>
+      </div>
+      <div style="padding:16px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Avg Night</div><div style="font-size:16px;font-weight:700;color:var(--text)">€${y.rate}</div></div>
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Annual Gross</div><div style="font-size:16px;font-weight:700;color:#10b981">€${y.annual.toLocaleString()}</div></div>
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Annual Net</div><div style="font-size:16px;font-weight:700;color:#34d399">€${netIncome.toLocaleString()}</div></div>
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Avg Price</div><div style="font-size:16px;font-weight:700;color:var(--text)">€${avgP.toLocaleString()}</div></div>
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Net Yield</div><div style="font-size:16px;font-weight:700;color:${netYield>=5?'#10b981':netYield>=3?'var(--gold)':'#ef4444'}">${netYield}%</div></div>
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${d.t} • ${d.bd}bed</div><div style="font-size:16px;font-weight:700;color:var(--text)">🏖️ ${d.bk!==null?d.bk+'km':'—'}</div></div>
+      </div>
+      <div id="ycalc-${i}" style="display:none;padding:0 20px 20px;border-top:1px solid var(--border)">
+        <div style="padding-top:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;font-weight:700;color:var(--gold)">Investment Calculator</div>
+          <div style="font-size:10px;color:var(--muted)">3.75% interest • 25yr term</div>
+        </div>
+        <div style="margin-bottom:8px"><span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Down Payment: </span><span id="ydown-${i}" style="font-size:14px;font-weight:700;color:var(--gold)">30%</span></div>
+        <input type="range" id="yslider-${i}" min="10" max="100" value="30" style="width:100%;accent-color:var(--gold);margin-bottom:16px" oninput="updateCalc(${i},this.value,${avgP})">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" id="ycalcgrid-${i}">
+          ${calcGrid(i,30,avgP,netIncome)}
+        </div>
+      </div>`;
+    card.onclick=function(e){if(e.target.tagName==='INPUT')return;const calc=document.getElementById('ycalc-'+i);calc.style.display=calc.style.display==='none'?'block':'none';};
+    grid.appendChild(card);
+  });
+}
+function calcGrid(i,pct,avgP,netIncome){
+  const totalCost=Math.round(avgP*1.12);const down=Math.round(totalCost*pct/100);const loan=totalCost-down;
+  const r=0.0375/12;const n=25*12;const monthly=loan>0?Math.round(loan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)):0;
+  const annualMort=monthly*12;const cashFlow=netIncome-annualMort;const cashYield=down>0?+(cashFlow/down*100).toFixed(1):0;
+  const col=cashFlow>=0?'#10b981':'#ef4444';
+  return`<div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Down Payment</div><div style="font-size:16px;font-weight:700;color:var(--gold)">€${down.toLocaleString()}</div></div>
+    <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Mortgage/mo</div><div style="font-size:16px;font-weight:700;color:var(--text)">€${monthly.toLocaleString()}</div></div>
+    <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Annual Cashflow</div><div style="font-size:16px;font-weight:700;color:${col}">€${cashFlow.toLocaleString()}</div></div>
+    <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Total Cost (12%)</div><div style="font-size:16px;font-weight:700;color:var(--text)">€${totalCost.toLocaleString()}</div></div>
+    <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Loan Amount</div><div style="font-size:16px;font-weight:700;color:var(--text)">€${loan.toLocaleString()}</div></div>
+    <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Cash-on-Cash</div><div style="font-size:16px;font-weight:700;color:${cashYield>=0?'#10b981':'#ef4444'}">${cashYield}%</div></div>`;
+}
+function updateCalc(i,pct,avgP){
+  document.getElementById('ydown-'+i).textContent=pct+'%';
+  const y=calcYield(filtered[i]||D[i]);const avgPr=(filtered[i]||D[i]).pf+((filtered[i]||D[i]).pt||(filtered[i]||D[i]).pf);const netI=Math.round(y.annual*0.65);
+  document.getElementById('ycalcgrid-'+i).innerHTML=calcGrid(i,parseInt(pct),avgP,netI);
+}
 
 // CHARTS
 function renderCharts(){
@@ -713,7 +808,7 @@ function renderBar(id,data,vk,sfx,mx,cc){
 }
 
 // INIT
-D.forEach(d=>{if(d.bm>0){d.pm2lo=Math.round(d.pf/d.bm);d.pm2hi=d.pt&&d.pt!==d.pf?Math.round(d.pt/d.bm):d.pm2lo;d.pm2=Math.round(((d.pf+(d.pt||d.pf))/2)/d.bm);}d._mths=monthsToCompletion(d.c);d._grw=getGrowthRate(d);d._estMm2=Math.round(d.mm2*(1+(d._grw/100)*(d._mths/12)));d._sc=calcScore(d);});filtered=[...D];doSort();render();stats();
+D.forEach(d=>{if(d.bm>0){d.pm2lo=Math.round(d.pf/d.bm);d.pm2hi=d.pt&&d.pt!==d.pf?Math.round(d.pt/d.bm):d.pm2lo;d.pm2=Math.round(((d.pf+(d.pt||d.pf))/2)/d.bm);}d._mths=monthsToCompletion(d.c);d._grw=getGrowthRate(d);d._estMm2=Math.round(d.mm2*(1+(d._grw/100)*(d._mths/12)));d._yield=calcYield(d);d._sc=calcScore(d);});filtered=[...D];doSort();render();stats();
 document.getElementById('fQ').addEventListener('keyup',e=>{if(e.key==='Enter')go();});
 </script>
 </body>
