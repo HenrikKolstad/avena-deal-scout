@@ -284,6 +284,7 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
     <div class="prev-desc"><h4>Description</h4><p id="prevDesc"></p></div>
     <div class="prev-desc"><h4>Developer</h4><p id="prevDev"></p></div>
     <a id="prevLink" class="prev-link" href="#" target="_blank">Visit Developer Website →</a>
+    <button id="prevYieldBtn" onclick="goToYield()" style="display:block;width:100%;margin-top:8px;padding:12px 20px;border-radius:8px;border:1px solid var(--gold);cursor:pointer;font-size:13px;font-weight:700;background:linear-gradient(135deg,rgba(201,163,79,0.15),rgba(201,163,79,0.05));color:var(--gold);font-family:'Inter',sans-serif;letter-spacing:0.5px;transition:all .2s" onmouseenter="this.style.background='linear-gradient(135deg,var(--gold-dark),var(--gold))';this.style.color='#000'" onmouseleave="this.style.background='linear-gradient(135deg,rgba(201,163,79,0.15),rgba(201,163,79,0.05))';this.style.color='var(--gold)'">💰 Check Rental Yield →</button>
   </div>
 </div>
 
@@ -652,7 +653,9 @@ function galNav(dir){
 }
 
 // PREVIEW
+let currentPreviewIdx=0;
 function openPreview(idx){
+  currentPreviewIdx=idx;
   const d=D[idx],dc=disc(d),panel=document.getElementById('preview');
   galDeal=d;galImgs=getImgs(d);galIdx=0;
   // Main image
@@ -735,6 +738,7 @@ document.addEventListener('keydown',e=>{
 // TABS
 function stab(t){document.querySelectorAll('.tab').forEach(tb=>tb.classList.remove('active'));document.querySelector(`.tab[data-t="${t}"]`).classList.add('active');['deals','yield','market','about'].forEach(x=>document.getElementById('t-'+x).classList.toggle('hidden',x!==t));if(t==='market')renderCharts();if(t==='yield')renderYield();}
 
+function goToYield(){closePreview();stab('yield');setTimeout(()=>{const name=D[currentPreviewIdx]?.p;if(!name)return;const cards=document.querySelectorAll('#yieldGrid > div');cards.forEach(c=>{if(c.textContent.includes(name)){c.scrollIntoView({behavior:'smooth',block:'center'});c.style.borderColor='var(--gold)';c.click();setTimeout(()=>{c.style.borderColor='var(--gold)'},500);}});},200);}
 // RENTAL YIELD TAB
 let yieldSortKey='yield';
 function yieldSort(k){yieldSortKey=k;renderYield();}
