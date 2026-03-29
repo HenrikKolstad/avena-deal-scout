@@ -403,55 +403,57 @@ function fP(n){return'€'+n.toLocaleString('en');}
 function scColor(s){return s>=80?'#10b981':s>=70?'#34d399':s>=60?'var(--gold)':s>=50?'#f97316':'var(--muted)';}
 function monthsToCompletion(c){if(!c)return 0;let y,m;if(c.includes('Q')){const parts=c.split('-Q');y=parseInt(parts[0]);m=parseInt(parts[1])*3;}else{const parts=c.split('-');y=parseInt(parts[0]);m=parseInt(parts[1])||6;}const target=new Date(y,m-1);const now=new Date();return Math.max(0,Math.round((target-now)/(1000*60*60*24*30)));}
 function getGrowthRate(d){for(const g of mkt.grw){if(d.l.includes(g.a)||g.a.includes(d.l.split(',')[0].trim()))return g.v;}if(d.r==='cb-south')return 10;if(d.r==='cb-north')return 8;return 7;}
-// Rental data from AirDNA, Airbtics, Booking.com (2025-2026)
+// Rental data from AirDNA, Airbtics, Booking.com, Vrbo (2025-2026)
+// Format: k=location keyword, a=apt ADR, v=villa ADR, wk=weeks occupancy, src=data source
 const rentalData=[
-  {k:"Calpe",adr:150,wk:24,src:"AirDNA"},
-  {k:"Dénia",adr:160,wk:22,src:"AirDNA"},
-  {k:"Benidorm",adr:121,wk:25,src:"Airbtics"},
-  {k:"Villajoyosa",adr:100,wk:22,src:"AirROI"},
-  {k:"Punta Prima",adr:98,wk:22,src:"Airbtics"},
-  {k:"Playa Flamenca",adr:90,wk:21,src:"Airbtics"},
-  {k:"Torre de la Horadada",adr:115,wk:21,src:"Airbtics"},
-  {k:"Campoamor",adr:120,wk:20,src:"Airbtics"},
-  {k:"Gran Alacant",adr:83,wk:20,src:"Airbtics"},
-  {k:"Santa Pola",adr:83,wk:20,src:"Airbtics"},
-  {k:"Villamartín",adr:60,wk:19,src:"HomeToGo"},
-  {k:"Guardamar",adr:77,wk:21,src:"Airbtics"},
-  {k:"El Raso",adr:77,wk:21,src:"Airbtics"},
-  {k:"Orihuela Costa",adr:85,wk:20,src:"Airbtics"},
-  {k:"Torrevieja",adr:74,wk:20,src:"Airbtics"},
-  {k:"La Finca Golf",adr:55,wk:17,src:"Airbnb"},
-  {k:"Algorfa",adr:55,wk:17,src:"Airbnb"},
-  {k:"Ciudad Quesada",adr:55,wk:18,src:"Orihuela proxy"},
-  {k:"San Miguel",adr:42,wk:15,src:"Estimated"},
-  {k:"Finestrat",adr:90,wk:19,src:"Benidorm proxy"},
-  {k:"Benitachell",adr:110,wk:18,src:"Casamundo"},
-  {k:"Cumbre del Sol",adr:110,wk:18,src:"Casamundo"},
-  {k:"La Nucia",adr:70,wk:17,src:"Benidorm proxy"},
-  {k:"Polop",adr:65,wk:16,src:"Estimated"},
-  {k:"Altea",adr:130,wk:20,src:"AirDNA"},
-  {k:"Condado de Alhama",adr:42,wk:14,src:"Booking.com"},
-  {k:"Torre Pacheco",adr:55,wk:15,src:"AirDNA Murcia"},
-  {k:"Camposol",adr:60,wk:16,src:"AirDNA Mazarrón"},
-  {k:"Mazarrón",adr:80,wk:17,src:"AirDNA"},
-  {k:"La Manga",adr:80,wk:17,src:"Airbnb"},
-  {k:"Los Alcázares",adr:70,wk:16,src:"AirDNA"},
-  {k:"Alicante",adr:95,wk:21,src:"AirDNA"},
-  {k:"Cabo Peñas",adr:95,wk:21,src:"Orihuela proxy"}
+  {k:"Calpe",a:105,v:160,wk:24,src:"AirDNA/HomeTo Go"},
+  {k:"Dénia",a:130,v:180,wk:22,src:"AirDNA"},
+  {k:"Benidorm",a:100,v:170,wk:25,src:"Airbtics"},
+  {k:"Villajoyosa",a:90,v:150,wk:22,src:"AirROI"},
+  {k:"Punta Prima",a:85,v:130,wk:22,src:"Airbtics/Airbnb"},
+  {k:"La Ceñuela",a:85,v:130,wk:22,src:"Airbtics"},
+  {k:"Playa Flamenca",a:80,v:120,wk:21,src:"Airbtics"},
+  {k:"Torre de la Horadada",a:95,v:140,wk:21,src:"Airbtics"},
+  {k:"Campoamor",a:90,v:200,wk:20,src:"Airbnb/Booking"},
+  {k:"Gran Alacant",a:75,v:100,wk:20,src:"Airbtics"},
+  {k:"Santa Pola",a:75,v:100,wk:20,src:"Airbtics"},
+  {k:"Villamartín",a:55,v:85,wk:19,src:"HomeToGo"},
+  {k:"Guardamar",a:70,v:100,wk:21,src:"Airbtics"},
+  {k:"El Raso",a:70,v:100,wk:21,src:"Airbtics"},
+  {k:"Orihuela Costa",a:75,v:110,wk:20,src:"Airbtics"},
+  {k:"Torrevieja",a:65,v:95,wk:20,src:"Airbtics"},
+  {k:"La Finca Golf",a:70,v:140,wk:17,src:"Vrbo/Airbnb"},
+  {k:"Algorfa",a:70,v:140,wk:17,src:"Vrbo"},
+  {k:"Ciudad Quesada",a:55,v:130,wk:18,src:"Airbnb/Vrbo"},
+  {k:"San Miguel",a:40,v:60,wk:15,src:"Estimated"},
+  {k:"Finestrat",a:80,v:160,wk:19,src:"Airbnb"},
+  {k:"Sierra Cortina",a:100,v:225,wk:19,src:"Airbnb"},
+  {k:"Benitachell",a:90,v:200,wk:18,src:"Clickstay/Airbnb"},
+  {k:"Cumbre del Sol",a:90,v:300,wk:18,src:"Clickstay/Airbnb"},
+  {k:"La Nucia",a:60,v:95,wk:17,src:"Airbnb proxy"},
+  {k:"Polop",a:55,v:85,wk:16,src:"Airbnb proxy"},
+  {k:"Altea",a:110,v:170,wk:20,src:"AirDNA"},
+  {k:"Condado de Alhama",a:42,v:75,wk:14,src:"Booking.com"},
+  {k:"Torre Pacheco",a:50,v:70,wk:15,src:"AirDNA Murcia"},
+  {k:"Camposol",a:50,v:65,wk:16,src:"AirDNA Mazarrón"},
+  {k:"Mazarrón",a:70,v:140,wk:17,src:"AirDNA/Booking"},
+  {k:"El Alamillo",a:80,v:140,wk:17,src:"Airbnb/Booking"},
+  {k:"La Manga Club",a:180,v:220,wk:20,src:"Resort published"},
+  {k:"La Manga",a:75,v:110,wk:17,src:"Airbnb"},
+  {k:"Los Alcázares",a:60,v:90,wk:16,src:"AirDNA"},
+  {k:"Alicante",a:85,v:120,wk:21,src:"AirDNA"},
+  {k:"Cabo Peñas",a:85,v:120,wk:21,src:"Orihuela proxy"}
 ];
 function calcYield(d){
   const beds=d.bd||2;const isV=d.t==='Villa'||d.t==='Townhouse';
-  const bedMult=beds<=1?0.7:beds===2?1:beds===3?1.3:1.5;
-  const typeMult=isV?1.2:1;
-  const avgP2=(d.pf+(d.pt||d.pf))/2;
-  const luxMult=avgP2>=800000?2.2:avgP2>=500000?1.7:avgP2>=350000?1.3:1;
+  const bedMult=beds<=1?0.7:beds===2?1:beds>=3?1.2:1;
   // Find matching area
   let match=null;
   for(const r of rentalData){if(d.l.includes(r.k)||d.p.includes(r.k)){match=r;break;}}
   if(!match){for(const r of rentalData){if(r.k.includes(d.l.split(',')[0].trim())){match=r;break;}}}
-  const baseAdr=match?match.adr:(d.r==='cb-north'?80:d.r==='cb-south'?70:50);
+  const baseAdr=match?(isV?match.v:match.a):(d.r==='cb-north'?80:d.r==='cb-south'?70:50);
   const baseWk=match?match.wk:(d.r==='cb-north'?20:d.r==='cb-south'?19:16);
-  const rate=Math.round(baseAdr*bedMult*typeMult*luxMult);
+  const rate=Math.round(baseAdr*bedMult);
   const weeks=baseWk;
   const avgP=(d.pf+(d.pt||d.pf))/2;const annual=rate*weeks*7;
   const src=match?match.src:'Estimated';
