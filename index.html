@@ -453,7 +453,7 @@ function calcYield(d){
   if(!match){for(const r of rentalData){if(r.k.includes(d.l.split(',')[0].trim())){match=r;break;}}}
   const baseAdr=match?(isV?match.v:match.a):(d.r==='cb-north'?80:d.r==='cb-south'?70:50);
   const baseWk=match?match.wk:(d.r==='cb-north'?20:d.r==='cb-south'?19:16);
-  const rate=Math.round(baseAdr*bedMult);
+  const rate=Math.round(baseAdr*bedMult*1.2); // +20% new-build premium
   const weeks=baseWk;
   const avgP=(d.pf+(d.pt||d.pf))/2;const annual=rate*weeks*7;
   const src=match?match.src:'Estimated';
