@@ -696,27 +696,6 @@ let currentPreviewIdx=0;
 function openPreview(idx){
   currentPreviewIdx=idx;
   const d=D[idx],dc=disc(d),panel=document.getElementById('preview');
-  galDeal=d;galImgs=getImgs(d);galIdx=0;
-  // Main image
-  const imgArea=document.getElementById('prevImg');
-  const oldImgs=imgArea.querySelectorAll('img');oldImgs.forEach(e=>e.remove());
-  const mainImg=document.createElement('img');
-  mainImg.alt=d.p;
-  mainImg.style.cssText='width:100%;height:100%;object-fit:cover;';
-  // onerror BEFORE src — SVG fallback if external images blocked
-  mainImg.onerror=function(){this.onerror=null;this.src=getSvgFallback(d,0);};
-  mainImg.src=galImgs[0];
-  imgArea.insertBefore(mainImg,imgArea.firstChild);
-  // Badge
-  let badge=imgArea.querySelector('.prev-badge');
-  if(!badge){badge=document.createElement('span');badge.className='prev-badge';imgArea.appendChild(badge);}
-  badge.className='prev-badge '+(d.s==='off-plan'?'dt op':d.s==='under-construction'?'dt warm':'dt cool');
-  badge.textContent=d.s==='off-plan'?'Off-Plan':d.s==='under-construction'?'Under Construction':'Ready';
-  // Single image — hide gallery nav
-  document.getElementById('prevCounter').textContent='';
-  const thumbs=document.getElementById('prevThumbs');thumbs.innerHTML='';
-  // Hide nav arrows for single image
-  document.querySelectorAll('.prev-nav').forEach(function(el){el.style.display=galImgs.length>1?'':'none';});
   document.getElementById('prevTitle').textContent=d.p;
   document.getElementById('prevLoc').textContent=d.l+' — '+rLbl(d.r);
   const sb=document.getElementById('prevScoreBig');sb.textContent=d._sc;sb.style.color=scColor(d._sc);
