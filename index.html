@@ -222,7 +222,7 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
       <div>
         <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);margin-bottom:4px">Estimated Rental Yield</h2>
-        <p style="color:var(--muted);font-size:12px">Based on Airbnb market data • 18-22 weeks occupancy • Gross yield before expenses</p>
+        <p style="color:var(--muted);font-size:12px">Sources: AirDNA, Airbtics, Booking.com (2025-2026) • Net = 35% deducted (mgmt, cleaning, platform fees, running costs)</p>
       </div>
       <div style="display:flex;gap:12px;align-items:center">
         <span style="font-size:10px;color:var(--muted)">SORT:</span>
@@ -403,18 +403,57 @@ function fP(n){return'€'+n.toLocaleString('en');}
 function scColor(s){return s>=80?'#10b981':s>=70?'#34d399':s>=60?'var(--gold)':s>=50?'#f97316':'var(--muted)';}
 function monthsToCompletion(c){if(!c)return 0;let y,m;if(c.includes('Q')){const parts=c.split('-Q');y=parseInt(parts[0]);m=parseInt(parts[1])*3;}else{const parts=c.split('-');y=parseInt(parts[0]);m=parseInt(parts[1])||6;}const target=new Date(y,m-1);const now=new Date();return Math.max(0,Math.round((target-now)/(1000*60*60*24*30)));}
 function getGrowthRate(d){for(const g of mkt.grw){if(d.l.includes(g.a)||g.a.includes(d.l.split(',')[0].trim()))return g.v;}if(d.r==='cb-south')return 10;if(d.r==='cb-north')return 8;return 7;}
+// Rental data from AirDNA, Airbtics, Booking.com (2025-2026)
+const rentalData=[
+  {k:"Calpe",adr:150,wk:24,src:"AirDNA"},
+  {k:"Dénia",adr:160,wk:22,src:"AirDNA"},
+  {k:"Benidorm",adr:121,wk:25,src:"Airbtics"},
+  {k:"Villajoyosa",adr:100,wk:22,src:"AirROI"},
+  {k:"Punta Prima",adr:98,wk:22,src:"Airbtics"},
+  {k:"Playa Flamenca",adr:90,wk:21,src:"Airbtics"},
+  {k:"Torre de la Horadada",adr:115,wk:21,src:"Airbtics"},
+  {k:"Campoamor",adr:120,wk:20,src:"Airbtics"},
+  {k:"Gran Alacant",adr:83,wk:20,src:"Airbtics"},
+  {k:"Santa Pola",adr:83,wk:20,src:"Airbtics"},
+  {k:"Villamartín",adr:60,wk:19,src:"HomeToGo"},
+  {k:"Guardamar",adr:77,wk:21,src:"Airbtics"},
+  {k:"El Raso",adr:77,wk:21,src:"Airbtics"},
+  {k:"Orihuela Costa",adr:85,wk:20,src:"Airbtics"},
+  {k:"Torrevieja",adr:74,wk:20,src:"Airbtics"},
+  {k:"La Finca Golf",adr:55,wk:17,src:"Airbnb"},
+  {k:"Algorfa",adr:55,wk:17,src:"Airbnb"},
+  {k:"Ciudad Quesada",adr:55,wk:18,src:"Orihuela proxy"},
+  {k:"San Miguel",adr:42,wk:15,src:"Estimated"},
+  {k:"Finestrat",adr:90,wk:19,src:"Benidorm proxy"},
+  {k:"Benitachell",adr:110,wk:18,src:"Casamundo"},
+  {k:"Cumbre del Sol",adr:110,wk:18,src:"Casamundo"},
+  {k:"La Nucia",adr:70,wk:17,src:"Benidorm proxy"},
+  {k:"Polop",adr:65,wk:16,src:"Estimated"},
+  {k:"Altea",adr:130,wk:20,src:"AirDNA"},
+  {k:"Condado de Alhama",adr:42,wk:14,src:"Booking.com"},
+  {k:"Torre Pacheco",adr:55,wk:15,src:"AirDNA Murcia"},
+  {k:"Camposol",adr:60,wk:16,src:"AirDNA Mazarrón"},
+  {k:"Mazarrón",adr:80,wk:17,src:"AirDNA"},
+  {k:"La Manga",adr:80,wk:17,src:"Airbnb"},
+  {k:"Los Alcázares",adr:70,wk:16,src:"AirDNA"},
+  {k:"Alicante",adr:95,wk:21,src:"AirDNA"},
+  {k:"Cabo Peñas",adr:95,wk:21,src:"Orihuela proxy"}
+];
 function calcYield(d){
-  const bk=d.bk!==null?d.bk:20;const isV=d.t==='Villa'||d.t==='Townhouse';const isN=d.r==='cb-north';
-  const beds=d.bd||2;const bedMult=beds<=1?0.7:beds===2?1:beds===3?1.25:1.4;
-  let baseRate,weeks;
-  if(bk<=1){baseRate=isN?95:80;weeks=22;}
-  else if(bk<=3){baseRate=isN?80:65;weeks=20;}
-  else if(bk<=8){baseRate=isN?65:55;weeks=19;}
-  else{baseRate=isN?50:42;weeks=17;}
-  if(isV)baseRate*=1.15;
-  const rate=Math.round(baseRate*bedMult);
+  const beds=d.bd||2;const isV=d.t==='Villa'||d.t==='Townhouse';
+  const bedMult=beds<=1?0.7:beds===2?1:beds===3?1.3:1.5;
+  const typeMult=isV?1.2:1;
+  // Find matching area
+  let match=null;
+  for(const r of rentalData){if(d.l.includes(r.k)||d.p.includes(r.k)){match=r;break;}}
+  if(!match){for(const r of rentalData){if(r.k.includes(d.l.split(',')[0].trim())){match=r;break;}}}
+  const baseAdr=match?match.adr:(d.r==='cb-north'?80:d.r==='cb-south'?70:50);
+  const baseWk=match?match.wk:(d.r==='cb-north'?20:d.r==='cb-south'?19:16);
+  const rate=Math.round(baseAdr*bedMult*typeMult);
+  const weeks=baseWk;
   const avgP=(d.pf+(d.pt||d.pf))/2;const annual=rate*weeks*7;
-  return{gross:+(annual/avgP*100).toFixed(1),annual:Math.round(annual),rate:Math.round(rate)};
+  const src=match?match.src:'Estimated';
+  return{gross:+(annual/avgP*100).toFixed(1),annual:Math.round(annual),rate:Math.round(rate),weeks,src};
 }
 function yldCls(y){return y>=7?'color:#10b981':y>=5?'color:var(--gold)':y>=3?'color:var(--muted)':'color:#ef4444';}
 function yldTag(y){return`<span style="${yldCls(y)};font-weight:700">${y}%</span>`;}
@@ -770,7 +809,7 @@ function renderYield(){
         <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Annual Net</div><div style="font-size:16px;font-weight:700;color:#34d399">€${netIncome.toLocaleString()}</div></div>
         <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Avg Price</div><div style="font-size:16px;font-weight:700;color:var(--text)">€${avgP.toLocaleString()}</div></div>
         <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Net Yield</div><div style="font-size:16px;font-weight:700;color:${netYield>=5?'#10b981':netYield>=3?'var(--gold)':'#ef4444'}">${netYield}%</div></div>
-        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${d.t} • ${d.bd}bed</div><div style="font-size:16px;font-weight:700;color:var(--text)">🏖️ ${d.bk!==null?d.bk+'km':'—'}</div></div>
+        <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${d.t} • ${d.bd}bed • ${y.weeks}wk</div><div style="font-size:11px;color:var(--muted)">📊 ${y.src}</div></div>
       </div>
       <div id="ycalc-${i}" style="display:none;padding:0 20px 20px;border-top:1px solid var(--border)">
         <div style="padding-top:16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
