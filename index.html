@@ -262,12 +262,8 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
 <!-- PREVIEW PANEL -->
 <div class="preview-overlay" id="preview">
   <button class="prev-close" onclick="closePreview()">✕</button>
-  <div class="prev-img" id="prevImg">
-    <div class="prev-nav left" onclick="galNav(-1)">‹</div>
-    <div class="prev-nav right" onclick="galNav(1)">›</div>
-    <div class="prev-counter" id="prevCounter">1/6</div>
-  </div>
-  <div class="prev-thumbs" id="prevThumbs"></div>
+  <div id="prevImg" style="display:none"></div>
+  <div id="prevThumbs" style="display:none"></div>
   <div class="prev-body">
     <div id="prevTitle" class="prev-title"></div>
     <div id="prevLoc" class="prev-loc"></div>
