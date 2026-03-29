@@ -404,9 +404,14 @@ function monthsToCompletion(c){if(!c)return 0;let y,m;if(c.includes('Q')){const 
 function getGrowthRate(d){for(const g of mkt.grw){if(d.l.includes(g.a)||g.a.includes(d.l.split(',')[0].trim()))return g.v;}if(d.r==='cb-south')return 10;if(d.r==='cb-north')return 8;return 7;}
 function calcYield(d){
   const bk=d.bk!==null?d.bk:20;const isV=d.t==='Villa'||d.t==='Townhouse';const isN=d.r==='cb-north';
-  let rate,weeks;
-  if(isV){if(bk<=2){rate=isN?160:130;weeks=20;}else if(bk<=5){rate=isN?120:100;weeks=19;}else{rate=isN?100:80;weeks=18;}}
-  else{if(bk<=1){rate=isN?90:75;weeks=22;}else if(bk<=5){rate=isN?70:60;weeks=20;}else{rate=isN?50:45;weeks=18;}}
+  const beds=d.bd||2;const bedMult=beds<=1?0.7:beds===2?1:beds===3?1.25:1.4;
+  let baseRate,weeks;
+  if(bk<=1){baseRate=isN?95:80;weeks=22;}
+  else if(bk<=3){baseRate=isN?80:65;weeks=20;}
+  else if(bk<=8){baseRate=isN?65:55;weeks=19;}
+  else{baseRate=isN?50:42;weeks=17;}
+  if(isV)baseRate*=1.15;
+  const rate=Math.round(baseRate*bedMult);
   const avgP=(d.pf+(d.pt||d.pf))/2;const annual=rate*weeks*7;
   return{gross:+(annual/avgP*100).toFixed(1),annual:Math.round(annual),rate:Math.round(rate)};
 }
