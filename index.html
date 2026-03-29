@@ -222,7 +222,7 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
       <div>
         <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);margin-bottom:4px">Estimated Rental Yield</h2>
-        <p style="color:var(--muted);font-size:12px">Sources: AirDNA, Airbtics, Booking.com (2025-2026) • Net = 35% deducted (mgmt, cleaning, platform fees, running costs)</p>
+        <p style="color:var(--muted);font-size:12px">Sources: AirDNA, Airbtics, Booking.com (2025-2026) • Net = 25% deducted (Airbnb fees 14%, cleaning, IBI, insurance, utilities)</p>
       </div>
       <div style="display:flex;gap:12px;align-items:center">
         <span style="font-size:10px;color:var(--muted)">SORT:</span>
@@ -791,7 +791,7 @@ function renderYield(){
   });
   list.forEach((d,i)=>{
     const y=d._y;const avgP=Math.round((d.pf+(d.pt||d.pf))/2);
-    const netIncome=Math.round(y.annual*0.65);
+    const netIncome=Math.round(y.annual*0.75);
     const netYield=+(netIncome/avgP*100).toFixed(1);
     const yCol=y.gross>=7?'#10b981':y.gross>=5?'var(--gold)':y.gross>=3?'var(--muted)':'#ef4444';
     const card=document.createElement('div');
@@ -840,7 +840,7 @@ function calcGrid(i,pct,avgP,netIncome){
 }
 function updateCalc(i,pct,avgP){
   document.getElementById('ydown-'+i).textContent=pct+'%';
-  const y=calcYield(filtered[i]||D[i]);const avgPr=(filtered[i]||D[i]).pf+((filtered[i]||D[i]).pt||(filtered[i]||D[i]).pf);const netI=Math.round(y.annual*0.65);
+  const y=calcYield(filtered[i]||D[i]);const avgPr=(filtered[i]||D[i]).pf+((filtered[i]||D[i]).pt||(filtered[i]||D[i]).pf);const netI=Math.round(y.annual*0.75);
   document.getElementById('ycalcgrid-'+i).innerHTML=calcGrid(i,parseInt(pct),avgP,netI);
 }
 
