@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AVENA Explorer — Costa Blanca & Costa Cálida</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
   --bg: #0a0a0f;
@@ -235,6 +237,7 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
 
 <div class="tabs">
   <div class="tab active" data-t="deals" onclick="stab('deals')">Deal Rankings</div>
+  <div class="tab" data-t="map" onclick="stab('map')">Map</div>
   <div class="tab" data-t="yield" onclick="stab('yield')" style="color:var(--gold)">💰 Rental Yield</div>
   <div class="tab" data-t="market" onclick="stab('market')">Market Overview</div>
   <div class="tab" data-t="about" onclick="stab('about')">Scoring Method</div>
@@ -315,6 +318,13 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
     </div>
     <div id="yieldGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px"></div>
   </div>
+</div>
+
+<div id="t-map" class="hidden">
+  <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
+    <div style="font-size:12px;color:var(--muted)">🟢 Below market &bull; 🟡 At market &bull; 🔴 Above market — Click a pin for details</div>
+  </div>
+  <div id="mapContainer" style="height:600px;background:var(--card2);border:1px solid var(--border);margin:0 16px 16px;border-radius:10px;overflow:hidden"></div>
 </div>
 
 <div id="t-market" class="hidden">
@@ -1029,7 +1039,7 @@ document.addEventListener('keydown',e=>{
 });
 
 // TABS
-function stab(t){document.querySelectorAll('.tab').forEach(tb=>tb.classList.remove('active'));document.querySelector(`.tab[data-t="${t}"]`).classList.add('active');['deals','yield','market','about','legal'].forEach(x=>document.getElementById('t-'+x).classList.toggle('hidden',x!==t));if(t==='market')renderCharts();if(t==='yield')renderYield();}
+function stab(t){document.querySelectorAll('.tab').forEach(tb=>tb.classList.remove('active'));document.querySelector(`.tab[data-t="${t}"]`).classList.add('active');['deals','yield','market','about','legal','map'].forEach(x=>document.getElementById('t-'+x).classList.toggle('hidden',x!==t));if(t==='market')renderCharts();if(t==='yield')renderYield();if(t==='map')renderMap();}
 
 function updatePrevFav(){const d=D[currentPreviewIdx];if(!d)return;const btn=document.getElementById('prevFavBtn');const f=isFav(d);btn.textContent=f?'Remove from Favorites':'Add to Favorites';btn.style.borderColor=f?'var(--gold)':'var(--border)';btn.style.color=f?'var(--gold)':'var(--text)';}
 function goToYield(){closePreview();stab('yield');setTimeout(()=>{const name=D[currentPreviewIdx]?.p;if(!name)return;const cards=document.querySelectorAll('#yieldGrid > div');cards.forEach(c=>{if(c.textContent.includes(name)){c.scrollIntoView({behavior:'smooth',block:'center'});c.style.borderColor='var(--gold)';c.click();setTimeout(()=>{c.style.borderColor='var(--gold)'},500);}});},200);}
@@ -1108,6 +1118,69 @@ function renderCharts(){
 function renderBar(id,data,vk,sfx,mx,cc){
   const c=document.getElementById(id);c.innerHTML='';
   data.forEach(it=>{const v=it[vk]||it.v,p=(v/mx*100).toFixed(1);const r=document.createElement('div');r.className='bar-row';r.innerHTML=`<span class="bar-lbl">${it.a}</span><div class="bar-trk"><div class="bar-fl ${cc}" style="width:${p}%">${sfx==='€'?'€':''}${v.toLocaleString()}${sfx==='%'?'%':''}</div></div>`;c.appendChild(r);});
+}
+
+// MAP
+const locCoords={
+'Algorfa':[38.07,-0.87],'Alicante':[38.35,-0.49],'Albir':[38.57,-0.07],'Alfas del Pi':[38.58,-0.10],
+'Altea':[38.60,-0.05],'Benidorm':[38.53,-0.13],'Benijofar':[38.08,-0.82],'Bigastro':[38.07,-0.89],
+'Cabo Roig':[37.92,-0.73],'Calpe':[38.64,0.04],'Campoamor':[37.88,-0.75],'Cartagena':[37.61,-0.99],
+'Ciudad Quesada':[38.06,-0.79],'Daya Nueva':[38.10,-0.83],'Denia':[38.84,0.11],'Dolores':[38.14,-0.77],
+'El Campello':[38.43,-0.40],'El Raso':[38.10,-0.67],'Finestrat':[38.57,-0.22],'Formentera del Segura':[38.09,-0.85],
+'Gran Alacant':[38.24,-0.52],'Guardamar':[38.09,-0.66],'Guardamar Del Segura':[38.09,-0.66],
+'Hondon':[38.28,-0.97],'Javea':[38.78,0.16],'La Finca':[38.07,-0.87],'La Finca Golf Resort':[38.07,-0.87],
+'La Manga':[37.64,-0.72],'La Manga del Mar Menor':[37.64,-0.72],'La Manga Club':[37.62,-0.78],
+'La Marina':[38.15,-0.67],'La Mata':[37.97,-0.68],'La Nucia':[38.61,-0.13],'La Serena Golf':[37.75,-0.82],
+'La Union':[37.62,-0.88],'La Zenia':[37.93,-0.73],'Las Colinas':[37.89,-0.77],
+'Lo Pagan':[37.82,-0.78],'Lo Romero':[37.88,-0.80],
+'Los Alcazares':[37.74,-0.85],'Los Balcones':[37.95,-0.71],'Los Montesinos':[38.01,-0.78],
+'Mazarron':[37.60,-1.31],'Mil Palmeras':[37.87,-0.76],'Moraira':[38.69,0.14],'Mutxamel':[38.41,-0.45],
+'Pilar de la Horadada':[37.87,-0.79],'Pinar de Campoverde':[37.89,-0.80],'Playa Flamenca':[37.93,-0.72],
+'Playa Honda':[37.63,-0.77],'Polop':[38.63,-0.13],'Puerto de Mazarron':[37.57,-1.26],
+'Punta Prima':[37.95,-0.71],'Roda Golf':[37.72,-0.82],'Roda Golf Resort':[37.72,-0.82],
+'Rojales':[38.09,-0.72],'San Fulgencio':[38.12,-0.70],'San Javier':[37.80,-0.84],
+'San Juan':[38.40,-0.44],'San Juan de Alicante':[38.40,-0.44],
+'San Miguel':[37.98,-0.77],'San Miguel de Salinas':[37.98,-0.77],'San Pedro del Pinatar':[37.84,-0.79],
+'Santa Pola':[38.19,-0.56],'Santa Rosalia':[37.76,-0.95],'Santa Rosalia Resort':[37.76,-0.95],
+'Santiago de la Ribera':[37.80,-0.81],'Torre de la Horadada':[37.86,-0.76],'Torre Pacheco':[37.74,-0.95],
+'Torrevieja':[37.98,-0.68],'Villamartin':[37.94,-0.76],'Villajoyosa':[38.51,-0.23],
+'Vistabella':[38.04,-0.80],'Altaona':[37.93,-1.06],'Camposol':[37.62,-1.40],
+'Condado Alhama':[37.80,-1.43],'Entre Golf':[38.04,-0.80],'Las Filipinas':[37.90,-0.73],
+'Lomas de Campoamor':[37.90,-0.74],'Los Nietos':[37.64,-0.79],'Los Urrutias':[37.67,-0.82]
+};
+let mapInstance=null;
+function renderMap(){
+  if(mapInstance){mapInstance.remove();mapInstance=null;}
+  const container=document.getElementById('mapContainer');
+  container.style.height='600px';
+  mapInstance=L.map(container).setView([38.0,-0.7],9);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'OpenStreetMap',maxZoom:18
+  }).addTo(mapInstance);
+  filtered.forEach(d=>{
+    const loc=d.l.split(',')[0].trim();
+    let coords=locCoords[loc];
+    if(!coords){for(const[k,v]of Object.entries(locCoords)){if(loc.includes(k)||k.includes(loc)){coords=v;break;}}}
+    if(!coords)return;
+    // Jitter to avoid overlap
+    const jLat=coords[0]+(Math.random()-0.5)*0.01;
+    const jLng=coords[1]+(Math.random()-0.5)*0.01;
+    const dc=disc(d);
+    const color=dc>=15?'#10b981':dc>=0?'#c9a34f':'#ef4444';
+    const marker=L.circleMarker([jLat,jLng],{radius:6,fillColor:color,color:'#000',weight:1,opacity:0.8,fillOpacity:0.8});
+    const avgP=Math.round((d.pf+(d.pt||d.pf))/2);
+    marker.bindPopup(`<div style="font-family:Inter,sans-serif;min-width:200px">
+      <div style="font-weight:700;font-size:13px;margin-bottom:4px">${d.p}</div>
+      <div style="color:#666;font-size:11px;margin-bottom:8px">${d.l}</div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Price:</span><strong>${fP(d.pf)}</strong></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Score:</span><strong>${d._sc}/100</strong></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>vs Market:</span><strong style="color:${color}">${dc>=0?'-':'+'}<span>${Math.abs(dc).toFixed(0)}%</span></strong></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Type:</span><strong>${d.t} • ${d.bd}bed</strong></div>
+      ${d.u?`<a href="${d.u}" target="_blank" style="display:block;text-align:center;margin-top:8px;padding:6px;background:#c9a34f;color:#000;font-weight:700;font-size:11px;border-radius:4px;text-decoration:none">View Property →</a>`:''}
+    </div>`);
+    marker.addTo(mapInstance);
+  });
+  setTimeout(()=>mapInstance.invalidateSize(),100);
 }
 
 // INIT
