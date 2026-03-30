@@ -375,6 +375,16 @@ async function main() {
         .replace(/€\s*[\d,]+/g, '').replace(/\s+/g, ' ').trim();
       if (desc.length > 50) prop.f = desc.substring(0, 250);
 
+      // Extract usable area (more accurate than built area for €/m² calc)
+      const usableMatch = text.match(/max usable size\s*(\d+)/i) || text.match(/usable\s*size\s*(\d+)/i) || text.match(/usable\s*(\d+)\s*m/i);
+      if (usableMatch) {
+        const usable = parseInt(usableMatch[1]);
+        if (usable > 20 && usable < prop.bm) {
+          prop.bm_original = prop.bm; // Keep original built area
+          prop.bm = usable; // Use usable area for €/m² calculations
+        }
+      }
+
       verified.push(prop);
     } catch (e) {
       // If we can't fetch, keep it (benefit of the doubt)
