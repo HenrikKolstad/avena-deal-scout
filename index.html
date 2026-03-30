@@ -175,13 +175,26 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
 </div>
 
 <div class="controls">
-  <div class="cg"><label>Region</label><select id="fR"><option value="all">All Regions</option><option value="cb-south">Costa Blanca South</option><option value="cb-north">Costa Blanca North</option><option value="cc">Costa Cálida</option></select></div>
-  <div class="cg"><label>Type</label><select id="fT"><option value="all">All Types</option><option value="Villa">Villas</option><option value="Apartment">Apartments</option><option value="Townhouse">Townhouses</option></select></div>
-  <div class="cg"><label>Max Price (€)</label><input type="number" id="fP" value="1000000" step="50000"></div>
-  <div class="cg"><label>Min Score</label><select id="fS"><option value="0">All</option><option value="80">80+</option><option value="70">70+</option><option value="60">60+</option></select></div>
-  <div class="cg"><label>Status</label><select id="fO"><option value="all">All</option><option value="off-plan">Off-Plan Only</option><option value="under-construction">Under Construction</option><option value="ready">Ready</option></select></div>
-  <div class="cg"><label>Search</label><input type="text" id="fQ" placeholder="Developer, project, area..."></div>
+  <div class="cg"><label>Region</label><select id="fR" onchange="go()"><option value="all">All Regions</option><option value="cb-south">Costa Blanca South</option><option value="cb-north">Costa Blanca North</option><option value="costa-calida">Costa Calida</option></select></div>
+  <div class="cg"><label>Type</label><select id="fT" onchange="go()"><option value="all">All Types</option><option value="Villa">Villas</option><option value="Apartment">Apartments</option><option value="Townhouse">Townhouses</option><option value="Bungalow">Bungalows</option></select></div>
+  <div class="cg"><label>Max Price (€)</label><input type="number" id="fP" value="5000000" step="50000"></div>
+  <div class="cg"><label>Min Price (€)</label><input type="number" id="fPmin" value="0" step="50000"></div>
+  <div class="cg"><label>Min Score</label><select id="fS" onchange="go()"><option value="0">All</option><option value="80">80+</option><option value="70">70+</option><option value="60">60+</option><option value="50">50+</option></select></div>
+  <div class="cg"><label>Status</label><select id="fO" onchange="go()"><option value="all">All</option><option value="off-plan">Off-Plan Only</option><option value="under-construction">Under Construction</option><option value="ready">Ready</option></select></div>
+  <div class="cg"><label>Source</label><select id="fSrc" onchange="go()"><option value="all">All Properties</option><option value="curated">Verified Only</option><option value="scraped">Xavia Estate</option></select></div>
+  <div class="cg"><label>Search</label><input type="text" id="fQ" placeholder="Developer, project, area..." oninput="go()"></div>
+  <div class="cg"><label>Beds</label><select id="fBd" onchange="go()"><option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option></select></div>
   <div class="cg"><label>&nbsp;</label><button class="btn" onclick="go()">Filter</button></div>
+</div>
+<div style="padding:0 20px 10px;display:flex;gap:8px;flex-wrap:wrap">
+  <button class="btn" onclick="quickFilter('all')" style="font-size:10px;padding:4px 10px">All</button>
+  <button class="btn" onclick="quickFilter('budget')" style="font-size:10px;padding:4px 10px">Budget &lt;€200k</button>
+  <button class="btn" onclick="quickFilter('mid')" style="font-size:10px;padding:4px 10px">Mid €200-400k</button>
+  <button class="btn" onclick="quickFilter('premium')" style="font-size:10px;padding:4px 10px">Premium €400k+</button>
+  <button class="btn" onclick="quickFilter('beach')" style="font-size:10px;padding:4px 10px">Near Beach (&lt;2km)</button>
+  <button class="btn" onclick="quickFilter('golf')" style="font-size:10px;padding:4px 10px">Golf Resorts</button>
+  <button class="btn" onclick="quickFilter('cashflow')" style="font-size:10px;padding:4px 10px">Cash-Flow Positive</button>
+  <button class="btn" onclick="quickFilter('favs')" style="font-size:10px;padding:4px 10px;color:var(--gold)">My Favorites</button>
 </div>
 
 <div class="tabs">
@@ -312,10 +325,12 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
     <div class="prev-desc"><h4>Developer</h4><p id="prevDev"></p></div>
     <a id="prevLink" class="prev-link" href="#" target="_blank">Visit Developer Website →</a>
     <button id="prevYieldBtn" onclick="goToYield()" style="display:block;width:100%;margin-top:8px;padding:12px 20px;border-radius:8px;border:1px solid var(--gold);cursor:pointer;font-size:13px;font-weight:700;background:linear-gradient(135deg,rgba(201,163,79,0.15),rgba(201,163,79,0.05));color:var(--gold);font-family:'Inter',sans-serif;letter-spacing:0.5px;transition:all .2s" onmouseenter="this.style.background='linear-gradient(135deg,var(--gold-dark),var(--gold))';this.style.color='#000'" onmouseleave="this.style.background='linear-gradient(135deg,rgba(201,163,79,0.15),rgba(201,163,79,0.05))';this.style.color='var(--gold)'">💰 Check Rental Yield →</button>
+    <button id="prevFavBtn" onclick="toggleFav(D[currentPreviewIdx]?.ref||D[currentPreviewIdx]?.p);updatePrevFav()" style="display:block;width:100%;margin-top:8px;padding:12px 20px;border-radius:8px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-weight:700;background:var(--card2);color:var(--text);font-family:'Inter',sans-serif;letter-spacing:0.5px;transition:all .2s">Add to Favorites</button>
+    <a id="prevContact" href="#" target="_blank" style="display:block;width:100%;margin-top:8px;padding:14px 20px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:700;background:linear-gradient(135deg,#c9a34f,#a07d2e);color:#000;font-family:'Inter',sans-serif;letter-spacing:0.5px;text-align:center;text-decoration:none;transition:all .2s" onmouseenter="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 15px rgba(201,163,79,0.4)'" onmouseleave="this.style.transform='none';this.style.boxShadow='none'">Interested? Contact Xavia Estate →</a>
   </div>
 </div>
 
-<div class="footer">AVENA Explorer v2.0 — Data sourced from developer websites, Idealista, Tinsa & market reports (March 2026). Prices indicative. Always verify with developer.</div>
+<div class="footer">AVENA Explorer v2.0 — In partnership with <a href="https://xaviaestate.com" target="_blank" style="color:var(--gold);text-decoration:none">Xavia Estate</a>. Data sourced from developer websites, Idealista, Tinsa & market reports (March 2026). Prices indicative. Always verify with developer.</div>
 
 <script>
 const D=[
@@ -489,14 +504,42 @@ function calcYield(d){
 function yldCls(y){return y>=7?'color:#10b981':y>=5?'color:var(--gold)':y>=3?'color:var(--muted)':'color:#ef4444';}
 function yldTag(y){return`<span style="${yldCls(y)};font-weight:700">${y}%</span>`;}
 
+// FAVORITES
+let favs=JSON.parse(localStorage.getItem('avena_favs')||'[]');
+function toggleFav(ref,e){if(e)e.stopPropagation();const i=favs.indexOf(ref);if(i>=0)favs.splice(i,1);else favs.push(ref);localStorage.setItem('avena_favs',JSON.stringify(favs));render();}
+function isFav(d){return favs.includes(d.ref||d.p);}
+// QUICK FILTERS
+let activeQuick='';
+function quickFilter(preset){
+  activeQuick=preset;
+  document.getElementById('fR').value='all';document.getElementById('fT').value='all';
+  document.getElementById('fS').value='0';document.getElementById('fO').value='all';
+  document.getElementById('fSrc').value='all';document.getElementById('fQ').value='';
+  document.getElementById('fBd').value='0';
+  document.getElementById('fPmin').value='0';document.getElementById('fP').value='5000000';
+  go();
+}
 function go(){
-  const r=document.getElementById('fR').value,t=document.getElementById('fT').value,mp=parseInt(document.getElementById('fP').value)||1e6,ms=parseInt(document.getElementById('fS').value)||0,st=document.getElementById('fO').value,q=document.getElementById('fQ').value.toLowerCase();
+  const r=document.getElementById('fR').value,t=document.getElementById('fT').value,mp=parseInt(document.getElementById('fP').value)||5e6,mpMin=parseInt(document.getElementById('fPmin').value)||0,ms=parseInt(document.getElementById('fS').value)||0,st=document.getElementById('fO').value,q=document.getElementById('fQ').value.toLowerCase(),src=document.getElementById('fSrc').value,bd=parseInt(document.getElementById('fBd').value)||0;
   filtered=D.filter(d=>{
-    if(r!=='all'&&d.r!==r)return false;if(t!=='all'&&d.t!==t)return false;if(d.pf>mp)return false;if(d._sc<ms)return false;if(st!=='all'&&d.s!==st)return false;
-    if(q){const h=(d.d+d.p+d.l+d.t+d.f).toLowerCase();if(!h.includes(q))return false;}
+    if(r!=='all'&&d.r!==r)return false;if(t!=='all'&&d.t!==t)return false;
+    if(d.pf>mp||d.pf<mpMin)return false;if(d._sc<ms)return false;
+    if(st!=='all'&&d.s!==st)return false;
+    if(bd>0&&(d.bd||0)<bd)return false;
+    if(src==='curated'&&d.d==='Via Xavia Estate')return false;
+    if(src==='scraped'&&d.d!=='Via Xavia Estate')return false;
+    if(q){const h=(d.d+d.p+d.l+d.t+(d.f||'')).toLowerCase();if(!h.includes(q))return false;}
+    // Quick filter presets
+    if(activeQuick==='budget'&&d.pf>=200000)return false;
+    if(activeQuick==='mid'&&(d.pf<200000||d.pf>400000))return false;
+    if(activeQuick==='premium'&&d.pf<400000)return false;
+    if(activeQuick==='beach'&&(d.bk===null||d.bk>2))return false;
+    if(activeQuick==='golf'){const gl=(d.l+d.p).toLowerCase();if(!gl.includes('golf')&&!gl.includes('finca')&&!gl.includes('roda')&&!gl.includes('serena')&&!gl.includes('rosalia')&&!gl.includes('condado')&&!gl.includes('camposol')&&!gl.includes('marquesa')&&!gl.includes('vistabella')&&!gl.includes('colinas')&&!gl.includes('altaona'))return false;}
+    if(activeQuick==='cashflow'){const y=calcYield(d);const avgP=Math.round((d.pf+(d.pt||d.pf))/2);const net=Math.round(y.annual*0.75);const tc=Math.round(avgP*1.12);const down=Math.round(tc*0.3);const loan=tc-down;const rm=0.0375/12;const n=300;const mo=loan>0?Math.round(loan*(rm*Math.pow(1+rm,n))/(Math.pow(1+rm,n)-1)):0;if(net-mo*12<0)return false;}
+    if(activeQuick==='favs'&&!isFav(d))return false;
     return true;
   });
-  doSort();render();stats();
+  activeQuick='';doSort();render();stats();
 }
 function doSort(){
   const k=sort.k,dr=sort.d==='asc'?1:-1;
@@ -508,7 +551,7 @@ function render(){
     const rk=i+1,dc=disc(d),rc=rk<=3?'r'+rk:'';
     const tr=document.createElement('tr');tr.className=rc;tr.dataset.idx=D.indexOf(d);
     tr.onclick=function(){openPreview(parseInt(this.dataset.idx));};
-    tr.innerHTML=`<td><span class="rb">${rk}</span></td><td><span class="sc ${scCls(d._sc)}">${d._sc}</span></td><td><span class="dev">${d.d==='Via Xavia Estate'?'Xavia Estate':d.d}</span></td><td><span class="pn">${d.p}</span><br><span class="loc">${d.l}</span></td><td><span class="rt ${rCls(d.r)}">${rLbl(d.r)}</span></td><td><span class="tt ${tCls(d.t)}">${d.t}</span></td><td><span class="pm">${fP(d.pf)}</span>${d.pt&&d.pt!==d.pf?`<br><span style="color:var(--muted);font-size:10px">to ${fP(d.pt)}</span>`:''}</td><td style="font-weight:700">€${d.pm2lo.toLocaleString()}${d.pm2hi!==d.pm2lo?`<br><span style="color:var(--muted);font-size:10px">to €${d.pm2hi.toLocaleString()}</span>`:''}</td><td style="color:var(--muted);font-style:italic">€${d.mm2.toLocaleString()}</td><td>${dTag(dc)}</td><td>${d.bm?d.bm+'m²':'—'}</td><td>${d.pl?d.pl+'m²':'—'}</td><td>${d.bd||'—'}</td><td>🏖️ ${d.bk!==null?d.bk+'km':'—'}</td><td>${d.c||'—'}</td><td>${stTag(d.s)}</td>`;
+    tr.innerHTML=`<td><span class="rb">${rk}</span></td><td><span class="sc ${scCls(d._sc)}">${d._sc}</span></td><td><span class="dev">${d.d==='Via Xavia Estate'?'Xavia Estate':d.d}</span>${d.d!=='Via Xavia Estate'?'<br><span style="font-size:8px;background:rgba(16,185,129,0.15);color:#10b981;padding:1px 5px;border-radius:3px">Verified</span>':''}</td><td><span class="pn">${d.p}</span><br><span class="loc">${d.l}</span></td><td><span class="rt ${rCls(d.r)}">${rLbl(d.r)}</span></td><td><span class="tt ${tCls(d.t)}">${d.t}</span></td><td><span class="pm">${fP(d.pf)}</span>${d.pt&&d.pt!==d.pf?`<br><span style="color:var(--muted);font-size:10px">to ${fP(d.pt)}</span>`:''}</td><td style="font-weight:700">€${d.pm2lo.toLocaleString()}${d.pm2hi!==d.pm2lo?`<br><span style="color:var(--muted);font-size:10px">to €${d.pm2hi.toLocaleString()}</span>`:''}</td><td style="color:var(--muted);font-style:italic">€${d.mm2.toLocaleString()}</td><td>${dTag(dc)}</td><td>${d.bm?d.bm+'m²':'—'}</td><td>${d.pl?d.pl+'m²':'—'}</td><td>${d.bd||'—'}</td><td>🏖️ ${d.bk!==null?d.bk+'km':'—'}</td><td>${d.c||'—'}</td><td>${stTag(d.s)}</td>`;
     tb.appendChild(tr);
   });
   document.querySelectorAll('thead th').forEach(th=>{th.classList.remove('sa','sd');if(th.dataset.s===sort.k)th.classList.add(sort.d==='asc'?'sa':'sd');});
@@ -773,6 +816,12 @@ function openPreview(idx){
   document.getElementById('prevDev').textContent=d.d+' — '+d.dy+'+ years in the Spanish property market.';
   const link=document.getElementById('prevLink');
   if(d.u){link.href=d.u;link.style.display='block';}else{link.style.display='none';}
+  // Contact Xavia Estate
+  const subj=encodeURIComponent('Inquiry: '+d.p+' — '+d.l);
+  const body=encodeURIComponent('Hi Xavia Estate,\n\nI am interested in the property:\n\n'+d.p+'\nLocation: '+d.l+'\nPrice: '+fP(d.pf)+(d.pt&&d.pt!==d.pf?' - '+fP(d.pt):'')+'\nRef: '+(d.ref||'N/A')+'\n\nPlease send me more information.\n\nThank you');
+  document.getElementById('prevContact').href='mailto:info@xaviaestate.com?subject='+subj+'&body='+body;
+  // Favorite button
+  updatePrevFav();
   panel.classList.add('open');
   document.querySelectorAll('tbody tr').forEach(tr=>tr.classList.remove('selected'));
   const sel=document.querySelector(`tbody tr[data-idx="${idx}"]`);if(sel)sel.classList.add('selected');
@@ -787,6 +836,7 @@ document.addEventListener('keydown',e=>{
 // TABS
 function stab(t){document.querySelectorAll('.tab').forEach(tb=>tb.classList.remove('active'));document.querySelector(`.tab[data-t="${t}"]`).classList.add('active');['deals','yield','market','about'].forEach(x=>document.getElementById('t-'+x).classList.toggle('hidden',x!==t));if(t==='market')renderCharts();if(t==='yield')renderYield();}
 
+function updatePrevFav(){const d=D[currentPreviewIdx];if(!d)return;const btn=document.getElementById('prevFavBtn');const f=isFav(d);btn.textContent=f?'Remove from Favorites':'Add to Favorites';btn.style.borderColor=f?'var(--gold)':'var(--border)';btn.style.color=f?'var(--gold)':'var(--text)';}
 function goToYield(){closePreview();stab('yield');setTimeout(()=>{const name=D[currentPreviewIdx]?.p;if(!name)return;const cards=document.querySelectorAll('#yieldGrid > div');cards.forEach(c=>{if(c.textContent.includes(name)){c.scrollIntoView({behavior:'smooth',block:'center'});c.style.borderColor='var(--gold)';c.click();setTimeout(()=>{c.style.borderColor='var(--gold)'},500);}});},200);}
 // RENTAL YIELD TAB
 let yieldSortKey='yield';
