@@ -638,7 +638,7 @@ const rentalData=[
 ];
 function calcYield(d){
   const beds=d.bd||2;const isV=d.t==='Villa'||d.t==='Townhouse';
-  const bedMult=beds<=1?0.7:beds===2?1:beds>=3?1.2:1;
+  const bedMult=beds<=1?0.7:beds===2?1:beds===3?1.2:beds===4?1.5:beds>=5?1.8:1;
   // Find matching area
   let match=null;
   for(const r of rentalData){if(d.l.includes(r.k)||d.p.includes(r.k)){match=r;break;}}
@@ -651,7 +651,7 @@ function calcYield(d){
   const sizeMult=bm>=200?1.6:bm>=150?1.35:bm>=120?1.15:bm>=80?1:0.85;
   // Price tier — luxury properties command premium rates regardless of size
   const avgP=(d.pf+(d.pt||d.pf))/2;
-  const priceMult=avgP>=1000000?1.8:avgP>=700000?1.5:avgP>=500000?1.3:avgP>=350000?1.1:1;
+  const priceMult=avgP>=1500000?3:avgP>=1000000?2.5:avgP>=700000?2:avgP>=500000?1.6:avgP>=350000?1.2:1;
   // Use the higher of size or price multiplier (don't double-stack)
   const luxMult=Math.max(sizeMult,priceMult);
   const rate=Math.round(baseAdr*bedMult*newBuildPremium*luxMult);
