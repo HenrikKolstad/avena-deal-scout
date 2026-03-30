@@ -324,7 +324,7 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
   <div style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
     <div style="font-size:12px;color:var(--muted)">🟢 Below market &bull; 🟡 At market &bull; 🔴 Above market — Click a pin for details</div>
   </div>
-  <div id="mapContainer" style="height:600px;background:var(--card2);border:1px solid var(--border);margin:0 16px 16px;border-radius:10px;overflow:hidden"></div>
+  <div id="mapContainer" style="height:600px;background:var(--card2);border:1px solid var(--border);margin:0 16px 16px;border-radius:10px;overflow:hidden;transition:margin .3s"></div>
 </div>
 
 <div id="t-market" class="hidden">
@@ -1027,11 +1027,11 @@ function openPreview(idx){
   document.getElementById('prevContact').href='mailto:info@xaviaestate.com?subject='+subj+'&body='+body;
   // Favorite button
   updatePrevFav();
-  panel.classList.add('open');
+  panel.classList.add('open');document.getElementById('mapContainer').style.marginRight='500px';if(mapInstance)setTimeout(()=>mapInstance.invalidateSize(),300);
   document.querySelectorAll('tbody tr').forEach(tr=>tr.classList.remove('selected'));
   const sel=document.querySelector(`tbody tr[data-idx="${idx}"]`);if(sel)sel.classList.add('selected');
 }
-function closePreview(){document.getElementById('preview').classList.remove('open');document.querySelectorAll('tbody tr').forEach(tr=>tr.classList.remove('selected'));}
+function closePreview(){document.getElementById('preview').classList.remove('open');document.querySelectorAll('tbody tr').forEach(tr=>tr.classList.remove('selected'));document.getElementById('mapContainer').style.marginRight='16px';if(mapInstance)setTimeout(()=>mapInstance.invalidateSize(),300);}
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape')closePreview();
   if(e.key==='ArrowLeft'&&document.getElementById('preview').classList.contains('open'))galNav(-1);
