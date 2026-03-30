@@ -1,0 +1,29 @@
+name: Weekly Property Scrape
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 6am UTC
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install
+
+      - run: node scraper.js
+        timeout-minutes: 15
+
+      - name: Commit and push updated data
+        run: |
+          git config user.name "Avena Scraper Bot"
+          git config user.email "bot@avena-explorer.app"
+          git add data.json
+          git diff --staged --quiet || git commit -m "Auto-update: $(date +%Y-%m-%d) — $(cat data.json | node -e "process.stdin.on('data',d=>console.log(JSON.parse(d).length+' properties'))")"
+          git push

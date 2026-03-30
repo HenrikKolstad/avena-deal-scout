@@ -462,7 +462,16 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
   </div>
 </div>
 
-<div class="footer">AVENA Explorer v2.0 — In partnership with <a href="https://xaviaestate.com" target="_blank" style="color:var(--gold);text-decoration:none">Xavia Estate</a>. Data sourced from developer websites, Idealista, Tinsa & market reports (March 2026). Prices indicative. Always verify with developer.</div>
+<div style="background:linear-gradient(135deg,rgba(201,163,79,0.08),var(--card));border-top:1px solid var(--border-gold);padding:32px;text-align:center">
+  <h3 style="font-family:'Playfair Display',serif;color:var(--gold);font-size:20px;margin-bottom:8px">Get Weekly Deal Alerts</h3>
+  <p style="color:var(--muted);font-size:12px;margin-bottom:16px;max-width:500px;margin-left:auto;margin-right:auto">Receive the best new-build deals in Costa Blanca & Costa Cálida straight to your inbox every Monday. Unsubscribe anytime.</p>
+  <form id="alertForm" style="display:flex;gap:8px;justify-content:center;max-width:500px;margin:0 auto" onsubmit="submitAlert(event)">
+    <input type="email" id="alertEmail" placeholder="your@email.com" required style="flex:1;padding:12px 16px;border-radius:8px;border:1px solid var(--border);background:#08080d;color:var(--text);font-size:13px;font-family:'Inter',sans-serif;outline:none">
+    <button type="submit" style="padding:12px 24px;border-radius:8px;border:none;background:linear-gradient(135deg,#c9a34f,#a07d2e);color:#000;font-weight:700;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;transition:all .2s" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='none'">Subscribe</button>
+  </form>
+  <div id="alertMsg" style="margin-top:10px;font-size:12px;display:none"></div>
+</div>
+<div class="footer">AVENA Explorer v2.0 — In partnership with <a href="https://xaviaestate.com" target="_blank" style="color:var(--gold);text-decoration:none">Xavia Estate</a>. Data sourced from developer websites, Idealista, Tinsa & market reports (March 2026). Prices indicative. Always verify with developer. Not financial advice.</div>
 
 <script>
 const D=[
@@ -627,7 +636,8 @@ function calcYield(d){
   if(!match){for(const r of rentalData){if(r.k.includes(d.l.split(',')[0].trim())){match=r;break;}}}
   const baseAdr=match?(isV?match.v:match.a):(d.r==='cb-north'?80:d.r==='cb-south'?70:50);
   const baseWk=match?match.wk:(d.r==='cb-north'?20:d.r==='cb-south'?19:16);
-  const rate=Math.round(baseAdr*bedMult*1.2); // +20% new-build premium
+  const newBuildPremium=1.20; // New builds rent 20% above area average (modern finishes, pool, A/C)
+  const rate=Math.round(baseAdr*bedMult*newBuildPremium);
   const weeks=baseWk;
   const avgP=(d.pf+(d.pt||d.pf))/2;const annual=rate*weeks*7;
   const src=match?match.src:'Estimated';
@@ -1105,6 +1115,16 @@ function initData(){D.forEach(d=>{if(d.bm>0){d.pm2lo=Math.round(d.pf/d.bm);d.pm2
 // Load scraped data and merge with curated
 fetch('data.json').then(r=>r.json()).then(scraped=>{const curatedRefs=new Set(D.filter(d=>d.ref).map(d=>d.ref));const newProps=scraped.filter(s=>!curatedRefs.has(s.ref));D.push(...newProps);initData();console.log('Loaded '+scraped.length+' scraped, '+newProps.length+' new properties merged');}).catch(()=>{console.log('No data.json found, using curated data only');initData();});
 document.getElementById('fQ').addEventListener('keyup',e=>{if(e.key==='Enter')go();});
+// Email signup
+function submitAlert(e){e.preventDefault();const email=document.getElementById('alertEmail').value;const msg=document.getElementById('alertMsg');
+// Send to Xavia Estate
+const subj=encodeURIComponent('New Deal Alert Signup: '+email);
+const body=encodeURIComponent('New subscriber for weekly deal alerts:\n\nEmail: '+email+'\nDate: '+new Date().toISOString()+'\nSource: Avena Explorer');
+window.open('mailto:info@xaviaestate.com?subject='+subj+'&body='+body,'_blank');
+// Save locally
+const subs=JSON.parse(localStorage.getItem('avena_subs')||'[]');subs.push({email,date:new Date().toISOString()});localStorage.setItem('avena_subs',JSON.stringify(subs));
+msg.style.display='block';msg.style.color='#10b981';msg.textContent='Thank you! You will receive weekly deal alerts at '+email;
+document.getElementById('alertEmail').value='';}
 </script>
 </body>
 </html>
