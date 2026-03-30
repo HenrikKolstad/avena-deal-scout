@@ -1,0 +1,11 @@
+{
+  "name": "avena-deal-scout",
+  "version": "1.0.0",
+  "description": "Avena Explorer - New build property deal scanner",
+  "scripts": {
+    "scrape": "node scraper.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  }
+}

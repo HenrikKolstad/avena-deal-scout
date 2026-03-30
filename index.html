@@ -835,7 +835,9 @@ function renderBar(id,data,vk,sfx,mx,cc){
 }
 
 // INIT
-D.forEach(d=>{if(d.bm>0){d.pm2lo=Math.round(d.pf/d.bm);d.pm2hi=d.pt&&d.pt!==d.pf?Math.round(d.pt/d.bm):d.pm2lo;d.pm2=Math.round(((d.pf+(d.pt||d.pf))/2)/d.bm);}d._mths=monthsToCompletion(d.c);d._grw=getGrowthRate(d);d._estMm2=Math.round(d.mm2*(1+(d._grw/100)*(d._mths/12)));d._yield=calcYield(d);d._sc=calcScore(d);});filtered=[...D];doSort();render();stats();
+function initData(){D.forEach(d=>{if(d.bm>0){d.pm2lo=Math.round(d.pf/d.bm);d.pm2hi=d.pt&&d.pt!==d.pf?Math.round(d.pt/d.bm):d.pm2lo;d.pm2=Math.round(((d.pf+(d.pt||d.pf))/2)/d.bm);}d._mths=monthsToCompletion(d.c);d._grw=getGrowthRate(d);d._estMm2=Math.round(d.mm2*(1+(d._grw/100)*(d._mths/12)));d._yield=calcYield(d);d._sc=calcScore(d);});filtered=[...D];doSort();render();stats();}
+// Load scraped data and merge with curated
+fetch('data.json').then(r=>r.json()).then(scraped=>{const curatedRefs=new Set(D.filter(d=>d.ref).map(d=>d.ref));const newProps=scraped.filter(s=>!curatedRefs.has(s.ref));D.push(...newProps);initData();console.log('Loaded '+scraped.length+' scraped, '+newProps.length+' new properties merged');}).catch(()=>{console.log('No data.json found, using curated data only');initData();});
 document.getElementById('fQ').addEventListener('keyup',e=>{if(e.key==='Enter')go();});
 </script>
 </body>
