@@ -292,7 +292,7 @@ function parsePage(html) {
       bk: bk,
       c: 'TBA',
       s: 'off-plan',
-      dy: 0,
+      dy: 5,
       f: '',
       u: fullUrl,
       ref: ref

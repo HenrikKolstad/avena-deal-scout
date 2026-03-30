@@ -811,9 +811,9 @@ function openPreview(idx){
     <div class="prev-stat"><div class="prev-stat-val">${d.bk!==null?d.bk+' km':'—'}</div><div class="prev-stat-lbl">Beach Distance</div></div>
     <div class="prev-stat"><div class="prev-stat-val">${d.c}</div><div class="prev-stat-lbl">Est. Completion</div></div>
     <div class="prev-stat"><div class="prev-stat-val">${d.s==='off-plan'?'Off-Plan':d.s==='under-construction'?'Building':'Ready'}</div><div class="prev-stat-lbl">Status</div></div>`;
-  document.getElementById('prevTags').innerHTML=`<span class="prev-tag">${d.t}</span><span class="prev-tag">${rLbl(d.r)}</span><span class="prev-tag">${d.s}</span><span class="prev-tag">${d.dy}+ yrs developer</span>${d.pt?`<span class="prev-tag">Up to ${fP(d.pt)}</span>`:''}`;
+  document.getElementById('prevTags').innerHTML=`<span class="prev-tag">${d.t}</span><span class="prev-tag">${rLbl(d.r)}</span><span class="prev-tag">${d.s}</span>${d.d==='Via Xavia Estate'?'<span class="prev-tag">Via Xavia Estate</span>':`<span class="prev-tag">${d.dy}+ yrs developer</span>`}${d.pt?`<span class="prev-tag">Up to ${fP(d.pt)}</span>`:''}`;
   document.getElementById('prevDesc').textContent=d.f;
-  document.getElementById('prevDev').textContent=d.d+' — '+d.dy+'+ years in the Spanish property market.';
+  document.getElementById('prevDev').textContent=d.d==='Via Xavia Estate'?'Xavia Estate — 5 years in the Spanish market. 25 years in Norwegian real estate.':d.d+' — '+d.dy+'+ years in the Spanish property market.';
   const link=document.getElementById('prevLink');
   if(d.u){link.href=d.u;link.style.display='block';}else{link.style.display='none';}
   // Contact Xavia Estate
