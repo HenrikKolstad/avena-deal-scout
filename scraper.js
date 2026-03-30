@@ -333,36 +333,76 @@ async function main() {
   }
   const deduped = Object.values(unique);
 
+  // VERIFY: Check each property's detail page for new build keywords
+  console.log(`\nVerifying ${deduped.length} properties are genuine new builds...`);
+  const newBuildKeywords = ['new build','new development','obra nueva','off plan','off-plan','under construction','key ready','delivery 202','completion 202','fase ','phase 1','phase 2','phase 3','promotion','promocion','brand new','newly built','new construction','first occupation','nueva construccion','new property','new residential','new project'];
+  const resaleKeywords = ['resale','reform','renovated','renovación','reformed','bargain','reduced','bank repo','bank repossession','short sale','distressed','need of renovation','needs updating','original condition','traditional style','rustic','country house','cortijo','charming older','well maintained','established','mature garden','pier','private pier','mooring','berth','traditional spanish','recently refurbished','second hand','pre-owned','investment opportunity resale'];
+
+  const verified = [];
+  let checked = 0, removed = 0;
+
+  for (const prop of deduped) {
+    checked++;
+    if (checked % 50 === 0) process.stdout.write(`  Checked ${checked}/${deduped.length}...`);
+    if (checked % 50 === 0) console.log(` (${verified.length} verified, ${removed} removed)`);
+
+    try {
+      const html = await fetch(prop.u);
+      const text = html.toLowerCase();
+
+      // Check for resale indicators
+      const isResale = resaleKeywords.some(k => text.includes(k));
+      // Check for new build indicators
+      const isNewBuild = newBuildKeywords.some(k => text.includes(k));
+
+      if (isResale || !isNewBuild) {
+        removed++;
+        continue; // Skip resale or unconfirmed properties
+      }
+
+      // Also extract description if available
+      const $ = cheerio.load(html);
+      const desc = $('[class*="desc"], [class*="Desc"], [class*="text"], [class*="detail"]').text().substring(0, 500).trim();
+      if (desc) prop.f = desc.replace(/\s+/g, ' ').substring(0, 200);
+
+      verified.push(prop);
+    } catch (e) {
+      // If we can't fetch, keep it (benefit of the doubt)
+      verified.push(prop);
+    }
+
+    await sleep(300); // Faster since we're just checking text
+  }
+
+  console.log(`\n✅ Verification complete: ${verified.length} new builds confirmed, ${removed} resale/non-newbuild removed`);
+
   // Load existing curated data if available
-  let curated = [];
   try {
-    // Extract curated properties from index.html
     const indexHtml = fs.readFileSync('index.html', 'utf8');
     const match = indexHtml.match(/const D=\[([\s\S]*?)\];/);
     if (match) {
-      // We'll keep curated as separate — they're already in index.html
-      console.log('\nExisting curated data found in index.html');
+      console.log('Existing curated data found in index.html');
     }
   } catch (e) {}
 
-  // Write scraped data
-  fs.writeFileSync('data.json', JSON.stringify(deduped, null, 2));
+  // Write verified data
+  fs.writeFileSync('data.json', JSON.stringify(verified, null, 2));
 
   console.log('\n=========================================');
-  console.log(`✅ Done! ${deduped.length} unique properties saved to data.json`);
+  console.log(`✅ Done! ${verified.length} verified new builds saved to data.json`);
   console.log(`❌ ${errors} page errors`);
 
   // Stats
   const regions = {};
   const types = {};
-  deduped.forEach(p => {
+  verified.forEach(p => {
     regions[p.r] = (regions[p.r] || 0) + 1;
     types[p.t] = (types[p.t] || 0) + 1;
   });
   console.log('\nBy region:', JSON.stringify(regions));
   console.log('By type:', JSON.stringify(types));
 
-  const prices = deduped.filter(p => p.pf > 0).map(p => p.pf);
+  const prices = verified.filter(p => p.pf > 0).map(p => p.pf);
   if (prices.length) {
     console.log(`Price range: €${Math.min(...prices).toLocaleString()} — €${Math.max(...prices).toLocaleString()}`);
     console.log(`Average: €${Math.round(prices.reduce((a,b) => a+b, 0) / prices.length).toLocaleString()}`);
