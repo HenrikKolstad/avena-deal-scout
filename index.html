@@ -1130,7 +1130,7 @@ const locCoords={
 'Gran Alacant':[38.24,-0.52],'Guardamar':[38.09,-0.66],'Guardamar Del Segura':[38.09,-0.66],
 'Hondon':[38.28,-0.97],'Javea':[38.78,0.16],'La Finca':[38.07,-0.87],'La Finca Golf Resort':[38.07,-0.87],
 'La Manga':[37.64,-0.72],'La Manga del Mar Menor':[37.64,-0.72],'La Manga Club':[37.62,-0.78],
-'La Marina':[38.15,-0.67],'La Mata':[37.97,-0.68],'La Nucia':[38.61,-0.13],'La Serena Golf':[37.75,-0.82],
+'La Marina':[38.15,-0.67],'La Mata':[37.97,-0.68],'La Nucia':[38.61,-0.13],'La Serena Golf':[37.76,-0.85],
 'La Union':[37.62,-0.88],'La Zenia':[37.93,-0.73],'Las Colinas':[37.89,-0.77],
 'Lo Pagan':[37.82,-0.78],'Lo Romero':[37.88,-0.80],
 'Los Alcazares':[37.74,-0.85],'Los Balcones':[37.95,-0.71],'Los Montesinos':[38.01,-0.78],
@@ -1163,8 +1163,8 @@ function renderMap(){
     if(!coords){for(const[k,v]of Object.entries(locCoords)){if(loc.includes(k)||k.includes(loc)){coords=v;break;}}}
     if(!coords)return;
     // Jitter to avoid overlap
-    const jLat=coords[0]+(Math.random()-0.5)*0.01;
-    const jLng=coords[1]+(Math.random()-0.5)*0.01;
+    const jLat=coords[0]+(Math.random()-0.5)*0.003;
+    const jLng=coords[1]+(Math.random()-0.5)*0.003;
     const dc=disc(d);
     const color=dc>=15?'#10b981':dc>=0?'#c9a34f':'#ef4444';
     const marker=L.circleMarker([jLat,jLng],{radius:6,fillColor:color,color:'#000',weight:1,opacity:0.8,fillOpacity:0.8});
