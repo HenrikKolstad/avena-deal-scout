@@ -360,10 +360,20 @@ async function main() {
         continue; // Skip resale or unconfirmed properties
       }
 
-      // Also extract description if available
+      // Extract clean description
       const $ = cheerio.load(html);
-      const desc = $('[class*="desc"], [class*="Desc"], [class*="text"], [class*="detail"]').text().substring(0, 500).trim();
-      if (desc) prop.f = desc.replace(/\s+/g, ' ').substring(0, 200);
+      let desc = '';
+      // Try specific description selectors
+      $('[class*="propDesc"], [class*="PropDesc"], [class*="propertyDesc"], [class*="description"], [id*="desc"]').each((j, el) => {
+        const t = $(el).text().trim();
+        if (t.length > desc.length && t.length > 50) desc = t;
+      });
+      // Clean out garbage (image counters, nav text, form labels)
+      desc = desc.replace(/\d+ of \d+/g, '').replace(/See \d+ More Photographs/gi, '')
+        .replace(/Click to see all the photos/gi, '').replace(/Property Enquiry/gi, '')
+        .replace(/Accept Terms & Conditions/gi, '').replace(/XE\w{5,7}/g, '')
+        .replace(/€\s*[\d,]+/g, '').replace(/\s+/g, ' ').trim();
+      if (desc.length > 50) prop.f = desc.substring(0, 250);
 
       verified.push(prop);
     } catch (e) {
