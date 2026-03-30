@@ -237,7 +237,6 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
 
 <div class="tabs">
   <div class="tab active" data-t="deals" onclick="stab('deals')">Deal Rankings</div>
-  <div class="tab" data-t="map" onclick="stab('map')">Map</div>
   <div class="tab" data-t="yield" onclick="stab('yield')" style="color:var(--gold)">💰 Rental Yield</div>
   <div class="tab" data-t="market" onclick="stab('market')">Market Overview</div>
   <div class="tab" data-t="about" onclick="stab('about')">Scoring Method</div>
@@ -1039,7 +1038,7 @@ document.addEventListener('keydown',e=>{
 });
 
 // TABS
-function stab(t){document.querySelectorAll('.tab').forEach(tb=>tb.classList.remove('active'));document.querySelector(`.tab[data-t="${t}"]`).classList.add('active');['deals','yield','market','about','legal','map'].forEach(x=>document.getElementById('t-'+x).classList.toggle('hidden',x!==t));if(t==='market')renderCharts();if(t==='yield')renderYield();if(t==='map')renderMap();}
+function stab(t){document.querySelectorAll('.tab').forEach(tb=>tb.classList.remove('active'));document.querySelector(`.tab[data-t="${t}"]`).classList.add('active');['deals','yield','market','about','legal'].forEach(x=>document.getElementById('t-'+x).classList.toggle('hidden',x!==t));if(t==='market')renderCharts();if(t==='yield')renderYield();}
 
 function updatePrevFav(){const d=D[currentPreviewIdx];if(!d)return;const btn=document.getElementById('prevFavBtn');const f=isFav(d);btn.textContent=f?'Remove from Favorites':'Add to Favorites';btn.style.borderColor=f?'var(--gold)':'var(--border)';btn.style.color=f?'var(--gold)':'var(--text)';}
 function goToYield(){closePreview();stab('yield');setTimeout(()=>{const name=D[currentPreviewIdx]?.p;if(!name)return;const cards=document.querySelectorAll('#yieldGrid > div');cards.forEach(c=>{if(c.textContent.includes(name)){c.scrollIntoView({behavior:'smooth',block:'center'});c.style.borderColor='var(--gold)';c.click();setTimeout(()=>{c.style.borderColor='var(--gold)'},500);}});},200);}
