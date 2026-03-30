@@ -683,7 +683,9 @@ function render(){
     const rk=i+1,dc=disc(d),rc=rk<=3?'r'+rk:'';
     const tr=document.createElement('tr');tr.className=rc;tr.dataset.idx=D.indexOf(d);
     tr.onclick=function(){openPreview(parseInt(this.dataset.idx));};
-    tr.innerHTML=`<td><span class="rb">${rk}</span></td><td><span class="sc ${scCls(d._sc)}">${d._sc}</span></td><td><span class="dev">${d.d==='Via Xavia Estate'?'Xavia Estate':d.d}</span>${d.d!=='Via Xavia Estate'?'<br><span style="font-size:8px;background:rgba(16,185,129,0.15);color:#10b981;padding:1px 5px;border-radius:3px">Verified</span>':''}</td><td><span class="pn">${d.p}</span><br><span class="loc">${d.l}</span></td><td><span class="rt ${rCls(d.r)}">${rLbl(d.r)}</span></td><td><span class="tt ${tCls(d.t)}">${d.t}</span></td><td><span class="pm">${fP(d.pf)}</span>${d.pt&&d.pt!==d.pf?`<br><span style="color:var(--muted);font-size:10px">to ${fP(d.pt)}</span>`:''}</td><td style="font-weight:700">€${d.pm2lo.toLocaleString()}${d.pm2hi!==d.pm2lo?`<br><span style="color:var(--muted);font-size:10px">to €${d.pm2hi.toLocaleString()}</span>`:''}</td><td style="color:var(--muted);font-style:italic">€${d.mm2.toLocaleString()}</td><td>${dTag(dc)}</td><td>${d.bm?d.bm+'m²':'—'}</td><td>${d.pl?d.pl+'m²':'—'}</td><td>${d.bd||'—'}</td><td>🏖️ ${d.bk!==null?d.bk+'km':'—'}</td><td>${d.c||'—'}</td><td>${stTag(d.s)}</td>`;
+    const savedEur=d.mm2&&d.pm2&&d.bm?Math.round((d.mm2-d.pm2)*d.bm):0;
+    const savedCol=savedEur>=0?'#10b981':'#ef4444';
+    tr.innerHTML=`<td><span class="rb">${rk}</span></td><td><span class="sc ${scCls(d._sc)}">${d._sc}</span></td><td><span class="dev">${d.d==='Via Xavia Estate'?'Xavia Estate':d.d}</span>${d.d!=='Via Xavia Estate'?'<br><span style="font-size:8px;background:rgba(16,185,129,0.15);color:#10b981;padding:1px 5px;border-radius:3px">Verified</span>':''}</td><td><span class="pn">${d.p}</span><br><span class="loc">${d.l}</span></td><td><span class="rt ${rCls(d.r)}">${rLbl(d.r)}</span></td><td><span class="tt ${tCls(d.t)}">${d.t}</span></td><td><span class="pm">${fP(d.pf)}</span>${d.pt&&d.pt!==d.pf?`<br><span style="color:var(--muted);font-size:10px">to ${fP(d.pt)}</span>`:''}</td><td style="font-weight:700">€${d.pm2lo.toLocaleString()}${d.pm2hi!==d.pm2lo?`<br><span style="color:var(--muted);font-size:10px">to €${d.pm2hi.toLocaleString()}</span>`:''}</td><td style="color:var(--muted);font-style:italic">€${d.mm2.toLocaleString()}</td><td>${dTag(dc)}${savedEur!==0?`<br><span style="font-size:9px;color:${savedCol}">${savedEur>0?'Save':'Over'} €${Math.abs(savedEur).toLocaleString()}</span>`:''}</td><td>${d.bm?d.bm+'m²':'—'}</td><td>${d.pl?d.pl+'m²':'—'}</td><td>${d.bd||'—'}</td><td>🏖️ ${d.bk!==null?d.bk+'km':'—'}</td><td>${d.c||'—'}</td><td>${stTag(d.s)}</td>`;
     tb.appendChild(tr);
   });
   document.querySelectorAll('thead th').forEach(th=>{th.classList.remove('sa','sd');if(th.dataset.s===sort.k)th.classList.add(sort.d==='asc'?'sa':'sd');});
@@ -712,6 +714,7 @@ function render(){
         <div style="text-align:right;flex-shrink:0;margin-left:10px">
           <div style="font-size:15px;font-weight:700;color:var(--text)">${fP(d.pf)}</div>
           <div style="font-size:11px;font-weight:700;color:${dcCol}">${dc>=0?'-':'+'}<span>${Math.abs(dc).toFixed(0)}%</span></div>
+          <div style="font-size:9px;color:${dcCol}">${d.mm2&&d.pm2&&d.bm?((d.mm2-d.pm2)*d.bm>0?'Save €'+Math.abs(Math.round((d.mm2-d.pm2)*d.bm)).toLocaleString():'Over €'+Math.abs(Math.round((d.mm2-d.pm2)*d.bm)).toLocaleString()):''}</div>
           <div style="font-size:9px;color:var(--muted)">${d.bd||'—'} bed • ${d.bm?d.bm+'m²':'—'}</div>
         </div>
       </div>
