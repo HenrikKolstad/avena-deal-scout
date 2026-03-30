@@ -1157,14 +1157,21 @@ function renderMap(){
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
     attribution:'OpenStreetMap',maxZoom:18
   }).addTo(mapInstance);
+  renderMap._counts={};
   filtered.forEach(d=>{
     const loc=d.l.split(',')[0].trim();
     let coords=locCoords[loc];
     if(!coords){for(const[k,v]of Object.entries(locCoords)){if(loc.includes(k)||k.includes(loc)){coords=v;break;}}}
     if(!coords)return;
-    // Jitter to avoid overlap
-    const jLat=coords[0]+(Math.random()-0.5)*0.003;
-    const jLng=coords[1]+(Math.random()-0.5)*0.003;
+    // Spread pins in a spiral around center point (avoids sea placement)
+    if(!renderMap._counts)renderMap._counts={};
+    const locKey=coords[0]+','+coords[1];
+    if(!renderMap._counts[locKey])renderMap._counts[locKey]=0;
+    const idx=renderMap._counts[locKey]++;
+    const angle=(idx*137.5)*Math.PI/180; // golden angle spiral
+    const radius=0.0008*Math.sqrt(idx); // grows outward slowly (~80m per step)
+    const jLat=coords[0]+Math.cos(angle)*radius;
+    const jLng=coords[1]+Math.sin(angle)*radius;
     const dc=disc(d);
     const color=dc>=15?'#10b981':dc>=0?'#c9a34f':'#ef4444';
     const marker=L.circleMarker([jLat,jLng],{radius:6,fillColor:color,color:'#000',weight:1,opacity:0.8,fillOpacity:0.8});
