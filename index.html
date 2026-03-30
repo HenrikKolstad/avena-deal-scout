@@ -152,7 +152,44 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
 
 .footer{padding:16px 32px;border-top:1px solid var(--border);text-align:center;color:var(--muted);font-size:10px;letter-spacing:0.5px;}
 .hidden{display:none!important;}
-@media(max-width:768px){.chart-row{grid-template-columns:1fr;}.stats-row{gap:12px;}.preview-overlay{width:100%;}}
+@media(max-width:768px){
+  .top-bar{padding:14px 16px 12px;flex-direction:column;align-items:flex-start;gap:10px;position:relative;}
+  .logo-text h1{font-size:22px;}
+  .stats-row{gap:10px;width:100%;justify-content:space-between;}
+  .stat-val{font-size:16px;}
+  .stat-lbl{font-size:7px;letter-spacing:1px;}
+  .controls{padding:10px 12px;gap:8px;}
+  .cg{flex:1;min-width:calc(50% - 8px);}
+  select,input[type=text],input[type=number]{min-width:0;width:100%;font-size:11px;padding:6px 8px;}
+  .tabs{padding:0 8px;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:0;flex-wrap:nowrap;}
+  .tab{padding:10px 14px;font-size:10px;white-space:nowrap;flex-shrink:0;}
+  .table-wrap{padding:0 4px 16px;}
+  table{min-width:600px;font-size:10px;}
+  thead th{padding:6px 6px;font-size:8px;letter-spacing:0.5px;}
+  tbody td{padding:6px 6px;font-size:10px;}
+  .preview-overlay{width:100%;}
+  .prev-body{padding:16px;}
+  .prev-title{font-size:18px;}
+  .prev-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .prev-stat{padding:8px;}
+  .prev-stat-val{font-size:14px;}
+  .info-panel{margin:12px 8px;padding:16px;}
+  .chart-row{grid-template-columns:1fr;padding:12px 8px;}
+  .chart-card{padding:14px;}
+  .bar-lbl{width:80px;font-size:9px;}
+  .footer{padding:12px 16px;font-size:9px;}
+  /* Legal tab mobile */
+  #t-legal .info-panel div[style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr!important;}
+  #t-legal .info-panel div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important;}
+  #t-legal .info-panel div[style*="repeat(5"]{grid-template-columns:repeat(2,1fr)!important;}
+  /* Yield tab mobile */
+  #yieldGrid{grid-template-columns:1fr!important;}
+  /* Quick filter buttons */
+  .controls+div{padding:0 8px 8px!important;gap:4px!important;}
+  .controls+div .btn{font-size:9px!important;padding:3px 8px!important;}
+  /* Rental yield info boxes mobile */
+  #t-yield>div>div:first-child>div[style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr!important;}
+}
 </style>
 </head>
 <body>
