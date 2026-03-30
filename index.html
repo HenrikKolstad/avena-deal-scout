@@ -667,7 +667,7 @@ function go(){
     if(activeQuick==='premium'&&d.pf<400000)return false;
     if(activeQuick==='beach'&&(d.bk===null||d.bk>2))return false;
     if(activeQuick==='golf'){const gl=(d.l+d.p).toLowerCase();if(!gl.includes('golf')&&!gl.includes('finca')&&!gl.includes('roda')&&!gl.includes('serena')&&!gl.includes('rosalia')&&!gl.includes('condado')&&!gl.includes('camposol')&&!gl.includes('marquesa')&&!gl.includes('vistabella')&&!gl.includes('colinas')&&!gl.includes('altaona'))return false;}
-    if(activeQuick==='cashflow'){const y=calcYield(d);const avgP=Math.round((d.pf+(d.pt||d.pf))/2);const net=Math.round(y.annual*0.75);const tc=Math.round(avgP*1.12);const down=Math.round(tc*0.3);const loan=tc-down;const rm=0.0375/12;const n=300;const mo=loan>0?Math.round(loan*(rm*Math.pow(1+rm,n))/(Math.pow(1+rm,n)-1)):0;if(net-mo*12<0)return false;}
+    if(activeQuick==='cashflow'){const y=calcYield(d);const avgP=Math.round((d.pf+(d.pt||d.pf))/2);const net=Math.round(y.annual*0.75);const tc=Math.round(avgP*1.13);const down=Math.round(tc*0.3);const loan=tc-down;const rm=0.0375/12;const n=300;const mo=loan>0?Math.round(loan*(rm*Math.pow(1+rm,n))/(Math.pow(1+rm,n)-1)):0;if(net-mo*12<0)return false;}
     if(activeQuick==='favs'&&!isFav(d))return false;
     return true;
   });
@@ -1072,14 +1072,14 @@ function renderYield(){
   });
 }
 function calcGrid(i,pct,avgP,netIncome){
-  const totalCost=Math.round(avgP*1.12);const down=Math.round(totalCost*pct/100);const loan=totalCost-down;
+  const totalCost=Math.round(avgP*1.13);const down=Math.round(totalCost*pct/100);const loan=totalCost-down;
   const r=0.0375/12;const n=25*12;const monthly=loan>0?Math.round(loan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1)):0;
   const annualMort=monthly*12;const cashFlow=netIncome-annualMort;const cashYield=down>0?+(cashFlow/down*100).toFixed(1):0;
   const col=cashFlow>=0?'#10b981':'#ef4444';
   return`<div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Down Payment</div><div style="font-size:16px;font-weight:700;color:var(--gold)">€${down.toLocaleString()}</div></div>
     <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Mortgage/mo</div><div style="font-size:16px;font-weight:700;color:var(--text)">€${monthly.toLocaleString()}</div></div>
     <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Annual Cashflow</div><div style="font-size:16px;font-weight:700;color:${col}">€${cashFlow.toLocaleString()}</div></div>
-    <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Total Cost (12%)</div><div style="font-size:16px;font-weight:700;color:var(--text)">€${totalCost.toLocaleString()}</div></div>
+    <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Total Cost (13%)</div><div style="font-size:16px;font-weight:700;color:var(--text)">€${totalCost.toLocaleString()}</div></div>
     <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Loan Amount</div><div style="font-size:16px;font-weight:700;color:var(--text)">€${loan.toLocaleString()}</div></div>
     <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Cash-on-Cash</div><div style="font-size:16px;font-weight:700;color:${cashYield>=0?'#10b981':'#ef4444'}">${cashYield}%</div></div>`;
 }
