@@ -219,16 +219,47 @@ tbody tr.selected{background:rgba(201,163,79,0.1);border-left:3px solid var(--go
 
 <div id="t-yield" class="hidden">
   <div style="padding:24px 32px;max-width:1400px;margin:0 auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div>
-        <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--gold);margin-bottom:4px">Estimated Rental Yield</h2>
-        <p style="color:var(--muted);font-size:12px">Sources: AirDNA, Airbtics, Booking.com (2025-2026) • Net = 25% deducted (Airbnb fees 14%, cleaning, IBI, insurance, utilities)</p>
+    <div style="margin-bottom:24px">
+      <h2 style="font-family:'Playfair Display',serif;font-size:26px;color:var(--gold);margin-bottom:12px">Estimated Rental Yield</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:6px;font-weight:600">How It Works</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">Each property is matched to <strong>real Airbnb/Booking.com data</strong> from its exact area. Nightly rates are annual averages across high, mid, and low seasons — not just the peak summer price agents show you.</div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#10b981;margin-bottom:6px;font-weight:600">What's Included in Net (-25%)</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.7">
+            <span style="color:var(--text)">Airbnb platform fee</span> (14%)<br>
+            <span style="color:var(--text)">Cleaning</span> (~€35/turnover)<br>
+            <span style="color:var(--text)">IBI property tax + insurance</span><br>
+            <span style="color:var(--text)">Community fees</span><br>
+            <span style="color:var(--text)">Utilities</span> (water, electric)<br>
+            <span style="color:var(--text)">Maintenance</span> (~€500/yr)
+          </div>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#ef4444;margin-bottom:6px;font-weight:600">Not Included</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.7">
+            <span style="color:var(--text)">Spanish income tax</span> (19% IRNR for non-residents on net rental profit)<br>
+            <span style="color:var(--text)">Tourist license</span> (€250-500, one-time)<br>
+            <span style="color:var(--text)">Furnishing costs</span> (~€5-15k)<br>
+            <span style="color:var(--text)">Home country tax</span> (varies)<br>
+            <span style="color:var(--text)">Mortgage interest</span> (see calculator)
+          </div>
+        </div>
       </div>
-      <div style="display:flex;gap:12px;align-items:center">
-        <span style="font-size:10px;color:var(--muted)">SORT:</span>
-        <button class="btn" onclick="yieldSort('yield')" style="font-size:10px;padding:5px 12px">By Yield %</button>
-        <button class="btn" onclick="yieldSort('income')" style="font-size:10px;padding:5px 12px">By Income €</button>
-        <button class="btn" onclick="yieldSort('price')" style="font-size:10px;padding:5px 12px">By Price</button>
+      <div style="background:linear-gradient(135deg,rgba(212,175,55,0.06),var(--card2));border:1px solid rgba(212,175,55,0.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:12px;color:var(--muted)">
+          <strong style="color:var(--gold)">Sources:</strong> AirDNA, Airbtics, Vrbo, Booking.com (2025-2026 data) &bull;
+          <strong style="color:var(--gold)">Occupancy:</strong> 16-24 weeks/year based on beach distance &bull;
+          <strong style="color:var(--gold)">Self-managed model</strong> (no management company)
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-shrink:0">
+          <span style="font-size:10px;color:var(--muted)">SORT:</span>
+          <button class="btn" onclick="yieldSort('yield')" style="font-size:10px;padding:5px 12px">By Yield %</button>
+          <button class="btn" onclick="yieldSort('income')" style="font-size:10px;padding:5px 12px">By Income €</button>
+          <button class="btn" onclick="yieldSort('price')" style="font-size:10px;padding:5px 12px">By Price</button>
+        </div>
       </div>
     </div>
     <div id="yieldGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px"></div>
