@@ -656,7 +656,7 @@ function calcYield(d){
   const luxMult=Math.max(sizeMult,priceMult);
   const rate=Math.round(baseAdr*bedMult*newBuildPremium*luxMult);
   const weeks=baseWk;
-  const avgP=(d.pf+(d.pt||d.pf))/2;const annual=rate*weeks*7;
+  const annual=rate*weeks*7;
   const src=match?match.src:'Estimated';
   return{gross:+(annual/avgP*100).toFixed(1),annual:Math.round(annual),rate:Math.round(rate),weeks,src};
 }
