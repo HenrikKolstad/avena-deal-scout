@@ -651,10 +651,13 @@ function calcYield(d){
   const sizeMult=bm>=200?1.6:bm>=150?1.35:bm>=120?1.15:bm>=80?1:0.85;
   // Price tier — luxury properties command premium rates regardless of size
   const avgP=(d.pf+(d.pt||d.pf))/2;
-  const priceMult=avgP>=1500000?3:avgP>=1000000?2.5:avgP>=700000?2:avgP>=500000?1.6:avgP>=350000?1.2:1;
+  const priceMult=avgP>=2000000?4.5:avgP>=1500000?3.5:avgP>=1000000?2.8:avgP>=700000?2.2:avgP>=500000?1.7:avgP>=350000?1.25:1;
   // Use the higher of size or price multiplier (don't double-stack)
   const luxMult=Math.max(sizeMult,priceMult);
-  const rate=Math.round(baseAdr*bedMult*newBuildPremium*luxMult);
+  const rawRate=Math.round(baseAdr*bedMult*newBuildPremium*luxMult);
+  // Cap at realistic max nightly rates by property value
+  const maxRate=avgP>=2000000?700:avgP>=1500000?550:avgP>=1000000?450:avgP>=700000?350:avgP>=500000?280:999;
+  const rate=Math.min(rawRate,maxRate);
   const weeks=baseWk;
   const annual=rate*weeks*7;
   const src=match?match.src:'Estimated';
